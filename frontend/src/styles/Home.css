@@ -47,6 +47,13 @@
   .bet-button:focus {
     outline: none; /* Remove focus outline */
   }
+
+  .home-logo {
+    width: 200px; /* Adjust size as needed */
+    max-width: 80%; /* Responsive scaling */
+    margin-bottom: 20px; /* Space between logo and title */
+    filter: invert(40%) sepia(85%) saturate(300%) hue-rotate(90deg) brightness(95%) contrast(90%);
+}
   
 
 
