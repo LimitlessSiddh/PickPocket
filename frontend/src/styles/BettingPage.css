@@ -1,0 +1,30 @@
+/* src/styles/BettingPage.css */
+
+.betting-container {
+    padding: 20px;
+    text-align: center;
+    background-color: #111; /* Dark background */
+    color: white;
+    min-height: 100vh;
+  }
+  
+  .bet-item {
+    background-color: #222;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+  }
+  
+  .bet-item:hover {
+    background-color: #333;
+  }
+  
+  .bet-item strong {
+    color: #32cd32; /* Green accent */
+  }
+  
+  

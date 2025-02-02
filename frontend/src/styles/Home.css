@@ -1,0 +1,55 @@
+/* src/styles/Home.css */
+
+.home-container {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center items vertically */
+    align-items: center; /* Center items horizontally */
+    height: 100vh; /* Full viewport height */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #111; /* Dark background */
+  }
+  
+  .home-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #32cd32; /* Green accent */
+    text-align: center; /* Center title */
+  }
+  
+  .home-subtitle {
+    font-size: 1.2rem;
+    color: #66ff66; /* Lighter green */
+    margin-top: 10px;
+    text-align: center; /* Center subtitle */
+  }
+  
+  .bet-button {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #111, #32cd32); /* Reverse colors */
+    color: #111; /* Dark text */
+    font-size: 1.5rem;
+    padding: 20px 40px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Depth effect */
+  }
+  
+  .bet-button:hover {
+    background: linear-gradient(135deg, #32cd32, #111); /* Hover reverse colors */
+    transform: scale(1.05);
+  }
+  
+  .bet-button:focus {
+    outline: none; /* Remove focus outline */
+  }
+  
+
+
+
+
+  

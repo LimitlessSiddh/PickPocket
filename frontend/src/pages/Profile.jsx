@@ -1,23 +1,33 @@
+import { useState } from "react";
+import "../styles/Profile.css";
+
 const Profile = () => {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-primary text-white p-6">
-        <div className="bg-secondary p-6 rounded-2xl shadow-lg w-full max-w-md text-center">
-          <h2 className="text-3xl font-bold text-accent1">Your Profile</h2>
-          <p className="text-lg text-accent2 mt-2">Track your betting performance</p>
-  
-          <div className="mt-6 p-4 bg-primary rounded-lg shadow-md">
-            <p className="text-xl font-semibold">Total Bets: <span className="text-accent1">125</span></p>
-            <p className="text-xl font-semibold">Winning Percentage: <span className="text-accent1">+12.5%</span></p>
-            <p className="text-xl font-semibold">ROI: <span className="text-accent2">+10%</span></p>
-          </div>
-  
-          <button className="mt-6 bg-accent1 text-black px-6 py-2 rounded-lg text-lg font-semibold hover:bg-accent2 transition">
-            Edit Profile
-          </button>
+  // Placeholder user data (can be replaced with API data later)
+  const [user, setUser] = useState({
+    username: "BetMaster",
+    totalBets: 125,
+    winningPercentage: "+12.5%",
+    roi: "+10%",
+  });
+
+  return (
+    <div className="profile-container">
+      <div className="profile-card">
+        <h2 className="profile-title">🏅 {user.username}'s Profile</h2>
+        <p className="profile-subtitle">Track your betting performance</p>
+
+        <div className="profile-stats">
+          <p>Total Bets: <span className="highlight">{user.totalBets}</span></p>
+          <p>Winning Percentage: <span className="highlight positive">{user.winningPercentage}</span></p>
+          <p>ROI: <span className="highlight roi">{user.roi}</span></p>
         </div>
+
+        <button className="edit-profile-btn">Edit Profile</button>
       </div>
-    );
-  };
-  
-  export default Profile;
+    </div>
+  );
+};
+
+export default Profile;
+
   
