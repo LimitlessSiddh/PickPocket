@@ -1,23 +1,28 @@
-
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import authRoutes from './routes/auth.js';
+dotenv.config();  // Load environment variables
 
-dotenv.config();
+import mongoose from "mongoose";
 
-const app = express();
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-app.use(express.json());
-app.use(cookieParser());
+const connectDB = async () => {
+  try {
+    console.log("🔍 Attempting MongoDB Connection...");
+    console.log(`🔹 MONGO_URI: ${process.env.MONGO_URI || "Not Found!"}`); // Debugging
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error(err));
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-app.use("/api/auth", authRoutes);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    process.exit(1); // Stop the server if MongoDB is not connected
+  }
+};
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+connectDB();
+
+
+
+
+

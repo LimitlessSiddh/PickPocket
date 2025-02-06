@@ -1,41 +1,85 @@
-/* src/styles/Navbar.css */
+/* Navbar Container */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
     background-color: #111;
+    padding: 15px 30px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-}
-
-.logo {
+  }
+  
+  /* Logo */
+  .nav-logo {
     font-size: 24px;
     font-weight: bold;
     color: #32cd32;
-}
-
-.nav-links {
-    display: flex; /* Use flexbox to lay out links in a row */
-    justify-content: center; /* Center the links horizontally */
-    width: 100%; /* Ensure links take up the full width */
-}
-
-.nav-links a {
+    text-decoration: none;
+  }
+  
+  /* Navigation Links */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  /* Navbar Buttons */
+  .nav-button {
+    background: none;
     color: white;
-    margin: 0 15px;
+    padding: 10px 20px;
+    border: 2px solid #32cd32;
+    border-radius: 20px;
     text-decoration: none;
     font-size: 16px;
-    transition: 0.3s;
-}
-
-.nav-links a:hover {
-    color: #66ff66;
-}
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-button:hover {
+    background: #32cd32;
+    color: black;
+  }
+  
+  /* Special Sign Up Button */
+  .signup {
+    background: #32cd32;
+    color: black;
+    border: none;
+  }
+  
+  .signup:hover {
+    background: #2b9e4d;
+  }
+  
+  /* Logout Button */
+  .logout {
+    border: 2px solid red;
+  }
+  
+  .logout:hover {
+    background: red;
+    color: black;
+  }
+  
+  /* Fix Leaderboard Button Styling */
+  .leaderboard-button {
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid #75D99F;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  
+  .leaderboard-button:hover {
+    background: #75D99F;
+    color: black;
+  }
+  
+  
 
 
   

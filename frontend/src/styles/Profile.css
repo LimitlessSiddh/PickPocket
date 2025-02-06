@@ -1,76 +1,82 @@
-/* Profile page container */
 .profile-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #0D0D0D;
-    padding: 20px;
-  }
-  
-  /* Profile card */
-  .profile-card {
-    background: #1A1A1A;
-    padding: 20px 30px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 168, 120, 0.3);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  /* Profile title */
-  .profile-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #00A878;
-    margin-bottom: 10px;
-  }
-  
-  /* Profile subtitle */
-  .profile-subtitle {
-    font-size: 16px;
-    color: #75D99F;
-    margin-bottom: 20px;
-  }
-  
-  /* Stats section */
-  .profile-stats p {
-    font-size: 18px;
-    margin: 8px 0;
-    color: white;
-  }
-  
-  /* Highlighted stats */
-  .highlight {
-    font-weight: bold;
-  }
-  
-  /* Positive percentage */
-  .positive {
-    color: #00A878;
-  }
-  
-  /* ROI styling */
-  .roi {
-    color: #75D99F;
-  }
-  
-  /* Edit profile button */
-  .edit-profile-btn {
-    margin-top: 15px;
-    background: #00A878;
-    color: black;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .edit-profile-btn:hover {
-    background: #75D99F;
-  }
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #0D0D0D;
+  padding: 20px;
+}
+
+.profile-card {
+  background: #1A1A1A;
+  padding: 20px 30px;
+  border-radius: 12px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0px 4px 10px rgba(0, 168, 120, 0.3);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00A878;
+}
+
+.profile-stats p {
+  font-size: 18px;
+  margin: 8px 0;
+  color: white;
+}
+
+.highlight {
+  font-weight: bold;
+}
+
+.positive {
+  color: #00A878;
+}
+
+.negative {
+  color: red;
+}
+
+.roi {
+  color: #75D99F;
+}
+
+.profile-edit {
+  margin-top: 15px;
+}
+
+.profile-edit input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 2px solid #32cd32;
+  border-radius: 5px;
+  background: #333;
+  color: white;
+}
+
+.profile-edit button {
+  padding: 10px 20px;
+  background: #32cd32;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
   

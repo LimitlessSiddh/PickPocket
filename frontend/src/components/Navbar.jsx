@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import "../styles/Navbar.css";
 
 const Navbar = ({ user, setUser }) => {
   const handleLogout = async () => {
@@ -10,16 +11,16 @@ const Navbar = ({ user, setUser }) => {
     <nav className="navbar">
       <Link to="/" className="nav-logo">PickPocket</Link>
       <div className="nav-links">
-        <Link to="/leaderboard">Leaderboard</Link>
+        <Link to="/leaderboard" className="nav-button leaderboard-button">Leaderboard</Link>
         {user ? (
           <>
-            <Link to="/profile">{user.username}</Link>
-            <button className="logout-button" onClick={handleLogout}>Logout</button>
+            <Link to="/profile" className="nav-button">{user.username}</Link>
+            <button className="nav-button logout" onClick={handleLogout}>Logout</button>
           </>
         ) : (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Sign Up</Link>
+            <Link to="/login" className="nav-button">Login</Link>
+            <Link to="/register" className="nav-button signup">Sign Up</Link>
           </>
         )}
       </div>
@@ -28,6 +29,7 @@ const Navbar = ({ user, setUser }) => {
 };
 
 export default Navbar;
+
 
 
 
