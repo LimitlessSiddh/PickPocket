@@ -24,5 +24,6 @@ dist-ssr
 *.sw?
 .env
 
-
+.env
 eslint.config.js
+/node_modules

@@ -1,6 +1,6 @@
 /* General body styles */
 body {
-    background-color: #111; /* Dark background */
+    background: color #111;; /* Dark background */
     color: white; /* White text */
     font-family: 'Arial', sans-serif; /* Clean, simple font */
     margin: 0;

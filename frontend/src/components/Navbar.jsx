@@ -1,15 +1,27 @@
 import { Link } from "react-router-dom";
-import "../styles/Navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ user, setUser }) => {
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    setUser(null);
+  };
+
   return (
     <nav className="navbar">
-      <h1 className="logo">PickPocket</h1>
+      <Link to="/" className="nav-logo">PickPocket</Link>
       <div className="nav-links">
-        <Link to="/">Home</Link>
-        <Link to="/betting">Betting</Link>
         <Link to="/leaderboard">Leaderboard</Link>
-        <Link to="/profile">Profile</Link>
+        {user ? (
+          <>
+            <Link to="/profile">{user.username}</Link>
+            <button className="logout-button" onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register">Sign Up</Link>
+          </>
+        )}
       </div>
     </nav>
   );
