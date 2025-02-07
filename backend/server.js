@@ -1,28 +1,18 @@
+import express from "express";
 import dotenv from "dotenv";
-dotenv.config();  // Load environment variables
+import cors from "cors";
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js"; // ✅ Import user routes
 
-import mongoose from "mongoose";
+dotenv.config();
+const app = express();
 
-const connectDB = async () => {
-  try {
-    console.log("🔍 Attempting MongoDB Connection...");
-    console.log(`🔹 MONGO_URI: ${process.env.MONGO_URI || "Not Found!"}`); // Debugging
+app.use(cors());
+app.use(express.json());
 
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes); // ✅ Add user routes
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    process.exit(1); // Stop the server if MongoDB is not connected
-  }
-};
-
-connectDB();
-
-
-
-
+const PORT = process.env.PORT || 5002;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 

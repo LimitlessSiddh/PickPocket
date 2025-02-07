@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -10,24 +10,41 @@ import Login from "./pages/Login";
 
 function App() {
   const [user, setUser] = useState(null);
-
+  
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     async function checkSession() {
       try {
-        const response = await fetch("/api/auth/verify", { credentials: "include" });
+        console.log("🔍 Checking session...");
+        const response = await fetch("http://localhost:5002/api/user/profile", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+          localStorage.removeItem("token");
+          setUser(null);
+          return;
+        }
+
         const data = await response.json();
-        if (response.ok) setUser(data);
-      } catch {
+        console.log("✅ Session Active:", data);
+        setUser(data);
+      } catch (error) {
+        console.error("❌ Session check failed:", error);
         setUser(null);
       }
     }
+
     checkSession();
   }, []);
 
   return (
     <Router>
       <Navbar user={user} setUser={setUser} />
-      <div className="p-4">
+      <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={user ? <Profile user={user} /> : <Login setUser={setUser} />} />
@@ -35,6 +52,7 @@ function App() {
           <Route path="/betting" element={<BettingPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="*" element={<h1 className="error-page">404 Not Found</h1>} />
         </Routes>
       </div>
     </Router>
@@ -42,6 +60,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

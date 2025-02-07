@@ -4,79 +4,115 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #0D0D0D;
+  background: radial-gradient(circle, #0A0A0A 30%, #111 100%);
   padding: 20px;
+  color: white;
 }
 
 .profile-card {
-  background: #1A1A1A;
-  padding: 20px 30px;
-  border-radius: 12px;
+  background: #161616;
+  padding: 25px 35px;
+  border-radius: 14px;
   text-align: center;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0px 4px 10px rgba(0, 168, 120, 0.3);
+  max-width: 420px;
+  box-shadow: 0px 4px 12px rgba(0, 168, 120, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 6px 18px rgba(0, 168, 120, 0.5);
 }
 
 .profile-avatar {
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  border: 3px solid #00A878;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
 }
 
 .profile-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
   color: #00A878;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.profile-stats {
+  font-size: 18px;
+  margin: 12px 0;
 }
 
 .profile-stats p {
-  font-size: 18px;
-  margin: 8px 0;
-  color: white;
+  color: #DDD;
+  margin: 6px 0;
 }
 
 .highlight {
   font-weight: bold;
+  color: #32cd32;
 }
 
 .positive {
-  color: #00A878;
+  color: #00FF8C;
 }
 
 .negative {
-  color: red;
+  color: #FF4B4B;
 }
 
 .roi {
-  color: #75D99F;
+  color: #32cd32;
 }
 
 .profile-edit {
-  margin-top: 15px;
+  margin-top: 18px;
+  width: 100%;
 }
 
 .profile-edit input {
-  width: 100%;
-  padding: 10px;
+  width: 90%;
+  padding: 12px;
   margin: 10px 0;
   border: 2px solid #32cd32;
-  border-radius: 5px;
-  background: #333;
+  border-radius: 6px;
+  background: #222;
   color: white;
+  font-size: 16px;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.profile-edit input:focus {
+  border-color: #00A878;
 }
 
 .profile-edit button {
-  padding: 10px 20px;
-  background: #32cd32;
+  width: 100%;
+  padding: 12px 0;
+  background: linear-gradient(90deg, #00A878, #32cd32);
   color: black;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
+
+.profile-edit button:hover {
+  background: linear-gradient(90deg, #32cd32, #00A878);
+  transform: scale(1.05);
+}
+
 
   

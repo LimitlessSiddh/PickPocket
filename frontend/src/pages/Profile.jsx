@@ -1,33 +1,65 @@
-import { useState } from "react";
-import "../styles/Profile.css";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/Profile.css"; // ✅ Make sure the CSS file exists
 
 const Profile = () => {
-  // Placeholder user data (can be replaced with API data later)
-  const [user, setUser] = useState({
-    username: "BetMaster",
-    totalBets: 125,
-    winningPercentage: "+12.5%",
-    roi: "+10%",
-  });
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login"); // Redirect to login if not authenticated
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:5002/api/user/profile", {
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Profile fetch failed");
+        }
+
+        setUser(data.user);
+      } catch (err) {
+        console.error("❌ Profile Fetch Error:", err.message);
+        setError(err.message);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
+
+  if (error) return <p className="error">{error}</p>;
+  if (!user) return <p className="loading">Loading profile...</p>;
 
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <h2 className="profile-title">🏅 {user.username}'s Profile</h2>
-        <p className="profile-subtitle">Track your betting performance</p>
-
-        <div className="profile-stats">
-          <p>Total Bets: <span className="highlight">{user.totalBets}</span></p>
-          <p>Winning Percentage: <span className="highlight positive">{user.winningPercentage}</span></p>
-          <p>ROI: <span className="highlight roi">{user.roi}</span></p>
-        </div>
-
-        <button className="edit-profile-btn">Edit Profile</button>
+        <h2 className="profile-title">Welcome, {user.username}!</h2>
+        <p className="profile-email">📩 {user.email}</p>
+        <p className="profile-status">🏆 Betting Stats Coming Soon...</p>
       </div>
     </div>
   );
 };
 
 export default Profile;
+
+
+
+
+
 
   

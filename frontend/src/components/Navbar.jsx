@@ -1,26 +1,38 @@
-import { Link } from "react-router-dom";
-import "../styles/Navbar.css";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/Navbar.css"; // ✅ Ensure the CSS file exists
 
 const Navbar = ({ user, setUser }) => {
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
+    navigate("/login"); // ✅ Redirect after logout
   };
 
   return (
     <nav className="navbar">
-      <Link to="/" className="nav-logo">PickPocket</Link>
-      <div className="nav-links">
-        <Link to="/leaderboard" className="nav-button leaderboard-button">Leaderboard</Link>
+      <div className="navbar-logo">
+        <Link to="/"> PickPocket</Link>
+      </div>
+      <div className="navbar-links">
+        <Link to="/leaderboard">Leaderboard</Link>
+        <Link to="/betting">Betting</Link>
+      </div>
+      <div className="navbar-auth">
         {user ? (
           <>
-            <Link to="/profile" className="nav-button">{user.username}</Link>
-            <button className="nav-button logout" onClick={handleLogout}>Logout</button>
+            {/* ✅ Click on username navigates correctly */}
+            <button className="profile-btn" onClick={() => navigate("/profile")}>
+              👤 {user.username}
+            </button>
+            <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
           </>
         ) : (
           <>
-            <Link to="/login" className="nav-button">Login</Link>
-            <Link to="/register" className="nav-button signup">Sign Up</Link>
+            <Link to="/login" className="login-btn">🔑 Login</Link>
+            <Link to="/register" className="register-btn">📝 Register</Link>
           </>
         )}
       </div>
@@ -29,6 +41,8 @@ const Navbar = ({ user, setUser }) => {
 };
 
 export default Navbar;
+
+
 
 
 
