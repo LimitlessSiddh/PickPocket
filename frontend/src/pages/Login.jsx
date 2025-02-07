@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css"; // ✅ Ensure this CSS file is up to date
+import axios from "axios";
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState("");
@@ -15,16 +16,10 @@ const Login = ({ setUser }) => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5002/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
-      }
+      const response = await axios.post("/api/login",
+      {email: email,
+      password: password}, {withCredentials:true});
+        // headers: { "Content-Type": "application/json" },
 
       const data = await response.json();
 
@@ -37,6 +32,7 @@ const Login = ({ setUser }) => {
       navigate("/profile");
     } catch (err) {
       setError("Username and Password do not match");
+      throw Error(errorData.message);
     } finally {
       setLoading(false);
     }

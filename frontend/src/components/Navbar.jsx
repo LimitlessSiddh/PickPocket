@@ -14,7 +14,7 @@ const Navbar = ({ user, setUser }) => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <Link to="/"> PickPocket</Link>
+        <Link to="/">PickPocket</Link>
       </div>
       <div className="navbar-links">
         <Link to="/leaderboard">Leaderboard</Link>

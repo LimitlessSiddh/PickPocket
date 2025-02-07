@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "../styles/BettingPage.css";
 
 const BettingPage = () => {
@@ -10,8 +11,9 @@ const BettingPage = () => {
   useEffect(() => {
     const fetchOdds = async () => {
       try {
-        const response = await fetch(
-          `https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=${API_KEY}&regions=us`
+        const response = await axios.get(
+          `/oddapi/?apiKey=${API_KEY}&regions=us`,
+          {withCredentials: true}
         );
 
         if (!response.ok) {
