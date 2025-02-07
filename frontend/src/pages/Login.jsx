@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css"; // ✅ Ensure this CSS file is up to date
@@ -37,7 +36,7 @@ const Login = ({ setUser }) => {
       // ✅ Redirect user to profile after successful login
       navigate("/profile");
     } catch (err) {
-      setError(err.message);
+      setError("Username and Password do not match");
     } finally {
       setLoading(false);
     }

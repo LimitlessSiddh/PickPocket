@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -52,7 +52,7 @@ function App() {
           <Route path="/betting" element={<BettingPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="*" element={<h1 className="error-page">404 Not Found</h1>} />
+          <Route path="*" element={<Navigate to="/" replace/>} />
         </Routes>
       </div>
     </Router>
