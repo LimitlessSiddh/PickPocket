@@ -1,14 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css"; // ✅ Ensure the CSS file exists
+import { Link } from "react-router-dom";
+import "../styles/Navbar.css";
 
-const Navbar = ({ user, setUser }) => {
-  const navigate = useNavigate();
-
+const Navbar = ({ user, setUser, theme, setTheme }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    navigate("/login"); // ✅ Redirect after logout
+    window.location.href = "/login";
+  };
+
+  // ✅ Toggle Theme Function
+  const toggleTheme = () => {
+    console.log("🌓 Toggling Theme...");
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
   };
 
   return (
@@ -23,10 +27,7 @@ const Navbar = ({ user, setUser }) => {
       <div className="navbar-auth">
         {user ? (
           <>
-            {/* ✅ Click on username navigates correctly */}
-            <button className="profile-btn" onClick={() => navigate("/profile")}>
-              👤 {user.username}
-            </button>
+            <Link to="/profile" className="profile-btn">👤 {user.username}</Link>
             <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
           </>
         ) : (
@@ -36,11 +37,22 @@ const Navbar = ({ user, setUser }) => {
           </>
         )}
       </div>
+
+      {/* ✅ Toggle Switch for Dark Mode */}
+      <label className="theme-switch">
+        <input type="checkbox" checked={theme === "dark"} onChange={toggleTheme} />
+        <span className="slider"></span>
+      </label>
     </nav>
   );
 };
 
 export default Navbar;
+
+
+
+
+
 
 
 

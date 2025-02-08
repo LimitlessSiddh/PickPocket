@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Profile.css"; // ✅ Ensure the CSS file exists
+import "../styles/Profile.css";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -12,16 +12,16 @@ const Profile = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/login"); // Redirect to login if not authenticated
+        navigate("/login");
         return;
       }
 
       try {
         const response = await fetch("http://localhost:5002/api/user/profile", {
           method: "GET",
-          headers: {
+          headers: { 
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
         });
 
@@ -31,7 +31,7 @@ const Profile = () => {
           throw new Error(data.message || "Profile fetch failed");
         }
 
-        setUser(data); // ✅ Set user state with response data
+        setUser(data);
       } catch (err) {
         console.error("❌ Profile Fetch Error:", err.message);
         setError(err.message);
@@ -47,9 +47,24 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-card">
+        <img
+          src={user.avatar || "/default-avatar.png"}
+          alt="Profile Avatar"
+          className="profile-avatar"
+        />
         <h2 className="profile-title">Welcome, {user.username}!</h2>
         <p className="profile-email">📩 {user.email}</p>
-        <p className="profile-status">🏆 Betting Stats Coming Soon...</p>
+
+        <div className="profile-stats">
+          <p>🏆 <span className="highlight">Betting History:</span> Coming Soon...</p>
+          <p>💰 <span className="highlight">ROI:</span> --$</p>
+          <p>📊 <span className="highlight">Win Rate:</span> --%</p>
+        </div>
+
+        <div className="profile-buttons">
+          <button className="edit-profile-btn">Edit Profile</button>
+          <button className="upload-avatar-btn">Upload Avatar</button>
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,13 @@ import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark"); // Default to dark mode
+
+  useEffect(() => {
+    console.log("🎨 Current Theme:", theme);
+    document.body.setAttribute("data-theme", theme); // ✅ Set theme attribute on <body>
+    localStorage.setItem("theme", theme); // ✅ Save preference
+  }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -27,7 +34,7 @@ function App() {
         setUser(response.data);
       } catch (error) {
         console.error("❌ Profile Fetch Error:", error.response?.data || error);
-        localStorage.removeItem("token"); // Remove invalid session
+        localStorage.removeItem("token");
         setUser(null);
       }
     }
@@ -37,7 +44,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} setUser={setUser} />
+      <Navbar user={user} setUser={setUser} theme={theme} setTheme={setTheme} />
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -54,6 +61,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
