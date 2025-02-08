@@ -7,38 +7,32 @@ import Leaderboard from "./pages/Leaderboard";
 import BettingPage from "./pages/BettingPage";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
-  
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    async function checkSession() {
+    async function fetchProfile() {
       try {
-        console.log("🔍 Checking session...");
-        const response = await fetch("http://localhost:5002/api/user/profile", {
-          method: "GET",
+        console.log("🔍 Fetching profile...");
+        const response = await axios.get("http://localhost:5002/api/user/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) {
-          localStorage.removeItem("token");
-          setUser(null);
-          return;
-        }
-
-        const data = await response.json();
-        console.log("✅ Session Active:", data);
-        setUser(data);
+        console.log("✅ Profile Data:", response.data);
+        setUser(response.data);
       } catch (error) {
-        console.error("❌ Session check failed:", error);
+        console.error("❌ Profile Fetch Error:", error.response?.data || error);
+        localStorage.removeItem("token"); // Remove invalid session
         setUser(null);
       }
     }
 
-    checkSession();
+    fetchProfile();
   }, []);
 
   return (
@@ -47,12 +41,12 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={user ? <Profile user={user} /> : <Login setUser={setUser} />} />
+          <Route path="/profile" element={user ? <Profile user={user} /> : <Navigate to="/login" />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/betting" element={<BettingPage />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Register setUser={setUser} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="*" element={<Navigate to="/" replace/>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>
@@ -60,6 +54,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

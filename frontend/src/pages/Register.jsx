@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css"; // ✅ Ensure this CSS file is updated
+import axios from "axios";
 
-const Register = () => {
+const Register = ({ setUser }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,23 +16,49 @@ const Register = () => {
     setError("");
     setLoading(true);
 
+    // ✅ Basic Input Validation
+    if (!username || !email || !password) {
+      setError("All fields are required!");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:5002/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+      console.log("🔍 Sending registration request...");
+      const response = await axios.post("http://localhost:5002/api/auth/register", {
+        username,
+        email,
+        password,
       });
 
-      const data = await response.json();
+      console.log("✅ Server response:", response.data);
 
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+      if (response.status === 201) {
+        const { token, user } = response.data;
+
+        // ✅ Store token and user info
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+
+        // ✅ Redirect to profile after successful sign-up
+        navigate("/profile");
+      } else {
+        setError("Registration failed. Please try again.");
       }
-
-      // ✅ Navigate to login after successful signup
-      navigate("/login");
     } catch (err) {
-      setError(err.message);
+      console.error("❌ Registration error:", err);
+
+      // ✅ Handle API Response Errors
+      if (err.response) {
+        if (err.response.status === 400) {
+          setError("Email or username already in use.");
+        } else {
+          setError(err.response.data.message || "Something went wrong. Try again.");
+        }
+      } else {
+        setError("Could not connect to server. Check your internet connection.");
+      }
     } finally {
       setLoading(false);
     }
@@ -40,8 +67,8 @@ const Register = () => {
   return (
     <div className="register-container">
       <div className="register-card">
-        <h2 className="register-title">Create an Account</h2>
-        <p className="register-subtitle">Join PickPocket and start tracking your bets.</p>
+        <h2 className="register-title">Join PickPocket</h2>
+        <p className="register-subtitle">Create an account to start tracking your bets.</p>
 
         {error && <p className="register-error">{error}</p>}
 
@@ -53,6 +80,7 @@ const Register = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -63,6 +91,7 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -73,6 +102,7 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -90,5 +120,6 @@ const Register = () => {
 };
 
 export default Register;
+
 
 

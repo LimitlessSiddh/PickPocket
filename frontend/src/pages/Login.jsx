@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css"; // ✅ Ensure this CSS file is up to date
+import "../styles/Login.css"; // ✅ Ensure this CSS file exists
 import axios from "axios";
 
 const Login = ({ setUser }) => {
@@ -16,23 +16,30 @@ const Login = ({ setUser }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/login",
-      {email: email,
-      password: password}, {withCredentials:true});
-        // headers: { "Content-Type": "application/json" },
+      console.log("🔍 Sending login request...");
+      const response = await axios.post("http://localhost:5002/api/auth/login", {
+        email,
+        password,
+      });
 
-      const data = await response.json();
+      console.log("✅ Server response:", response.data);
 
-      // ✅ Store token and user info
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
+      if (response.status === 200) {
+        const { token, user } = response.data;
 
-      // ✅ Redirect user to profile after successful login
-      navigate("/profile");
+        // ✅ Store token and user info in local storage
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+
+        // ✅ Redirect user to profile after successful login
+        navigate("/profile");
+      } else {
+        setError("Invalid email or password");
+      }
     } catch (err) {
-      setError("Username and Password do not match");
-      throw Error(errorData.message);
+      console.error("❌ Login error:", err);
+      setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -83,5 +90,6 @@ const Login = ({ setUser }) => {
 };
 
 export default Login;
+
 
 

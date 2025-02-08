@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Profile.css"; // ✅ Make sure the CSS file exists
+import "../styles/Profile.css"; // ✅ Ensure the CSS file exists
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -19,9 +19,9 @@ const Profile = () => {
       try {
         const response = await fetch("http://localhost:5002/api/user/profile", {
           method: "GET",
-          headers: { 
+          headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         });
 
@@ -31,7 +31,7 @@ const Profile = () => {
           throw new Error(data.message || "Profile fetch failed");
         }
 
-        setUser(data.user);
+        setUser(data); // ✅ Set user state with response data
       } catch (err) {
         console.error("❌ Profile Fetch Error:", err.message);
         setError(err.message);
@@ -56,6 +56,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 
