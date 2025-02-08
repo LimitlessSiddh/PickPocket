@@ -1,10 +1,17 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import ProfileCard from "../components/ProfileCard";
+import "../styles/Profile.css";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const Profile = ({ user }) => {
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!user) return;
+    
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -13,8 +20,9 @@ const Profile = ({ user }) => {
         });
 
         setStats(response.data);
-      } catch (error) {
-        console.error("❌ Error fetching betting stats:", error);
+      } catch (err) {
+        setError("Failed to load betting stats.");
+        console.error("❌ Betting Stats Error:", err);
       }
     };
 
@@ -26,22 +34,26 @@ const Profile = ({ user }) => {
         });
 
         setHistory(response.data);
-      } catch (error) {
-        console.error("❌ Error fetching bet history:", error);
+      } catch (err) {
+        setError("Failed to load bet history.");
+        console.error("❌ Bet History Error:", err);
       }
     };
 
     fetchStats();
     fetchHistory();
-  }, []);
+  }, [user]);
+
+  if (!user) return <p>Loading user data...</p>;
 
   return (
     <div className="profile-container">
-      <div className="profile-card">
-        <h2>Welcome, {user.username}!</h2>
-        <p>📩 {user.email}</p>
-        <hr />
-        <h3>Betting History</h3>
+      <ProfileCard user={user} stats={stats} />
+
+      <div className="profile-history">
+        <h3>📊 Betting Performance</h3>
+        {error && <p className="error-message">{error}</p>}
+
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={history}>
             <XAxis dataKey="created_at" />
@@ -54,6 +66,8 @@ const Profile = ({ user }) => {
     </div>
   );
 };
+
+export default Profile;
 
 
 

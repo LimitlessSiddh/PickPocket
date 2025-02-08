@@ -1,56 +1,52 @@
-import { useState, useEffect } from "react";
-import "../styles/Profile.css";
+import { useState } from "react";
+import axios from "axios";
+import "../styles/ProfileCard.css";
 
-const Profile = ({ user }) => {
-  const [profile, setProfile] = useState(user);
+const ProfileCard = ({ user, stats }) => {
   const [newUsername, setNewUsername] = useState("");
-  const [avatar, setAvatar] = useState("");
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const response = await fetch("/api/auth/profile", { credentials: "include" });
-      const data = await response.json();
-      setProfile(data);
-    };
-    fetchProfile();
-  }, []);
+  const [avatar, setAvatar] = useState(user.avatar || "");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleUpdate = async () => {
-    const response = await fetch("/api/auth/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ username: newUsername || profile.username, avatar }),
-    });
-    
-    if (response.ok) {
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:5002/api/user/profile",
+        { username: newUsername || user.username, avatar },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setSuccess("Profile updated successfully!");
+    } catch (err) {
+      setError("Failed to update profile.");
+      console.error("❌ Update Error:", err);
     }
   };
 
   return (
-    <div className="profile-container">
-      <div className="profile-card">
-        <img src={profile.avatar || "/default-avatar.png"} alt="Avatar" className="profile-avatar" />
-        <h2 className="profile-title">{profile.username}</h2>
-        <p className="profile-subtitle">Your Betting Performance</p>
+    <div className="profile-card">
+      <img src={avatar || "/default-avatar.png"} alt="Avatar" className="profile-avatar" />
+      <h2 className="profile-title">{user.username}</h2>
+      <p className="profile-subtitle">{user.email}</p>
 
-        <div className="profile-stats">
-          <p>Total Bets: <span className="highlight">{profile.totalBets}</span></p>
-          <p>Bets Won: <span className="highlight positive">{profile.betsWon}</span></p>
-          <p>Bets Lost: <span className="highlight negative">{profile.betsLost}</span></p>
-          <p>ROI: <span className="highlight roi">{profile.roi}%</span></p>
-        </div>
-
-        <div className="profile-edit">
-          <input type="text" placeholder="New Username" onChange={(e) => setNewUsername(e.target.value)} />
-          <input type="text" placeholder="Avatar URL" onChange={(e) => setAvatar(e.target.value)} />
-          <button onClick={handleUpdate}>Update Profile</button>
-        </div>
+      <div className="profile-stats">
+        <p>Total Bets: <span>{stats?.totalBets || 0}</span></p>
+        <p>Bets Won: <span className="positive">{stats?.betsWon || 0}</span></p>
+        <p>Bets Lost: <span className="negative">{stats?.betsLost || 0}</span></p>
+        <p>ROI: <span className="roi">{stats?.roi || 0}%</span></p>
       </div>
+
+      <div className="profile-edit">
+        <input type="text" placeholder="New Username" onChange={(e) => setNewUsername(e.target.value)} />
+        <input type="text" placeholder="Avatar URL" onChange={(e) => setAvatar(e.target.value)} />
+        <button onClick={handleUpdate}>Update Profile</button>
+      </div>
+
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
     </div>
   );
 };
 
-export default Profile;
+export default ProfileCard;

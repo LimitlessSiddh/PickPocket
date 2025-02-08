@@ -8,35 +8,29 @@ import BettingPage from "./pages/BettingPage";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import axios from "axios";
+import "./index.css"; // ✅ Make sure we are ONLY using `index.css`
 
 function App() {
   const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Default to light mode
 
   useEffect(() => {
-    console.log("🎨 Setting theme:", theme);
-    document.body.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.log("🔴 No token found, user is not logged in.");
-      return;
-    }
+    if (!token) return;
 
     async function fetchProfile() {
       try {
-        console.log("🔍 Fetching profile...");
         const response = await axios.get("http://localhost:5002/api/user/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("✅ Profile Data:", response.data);
         setUser(response.data);
       } catch (error) {
-        console.error("❌ Profile Fetch Error:", error.response?.data || error);
+        console.error("Profile Fetch Error:", error);
         localStorage.removeItem("token");
         setUser(null);
       }
@@ -64,6 +58,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

@@ -1,26 +1,26 @@
 /* ✅ Default Light Mode */
-body {
-  --bg-color: #ffffff;
-  --text-color: #000000;
+:root {
+  --bg-color: white;
+  --text-color: black;
   --card-bg: #f9f9f9;
   --border-color: #ccc;
-  --accent-color: #28a745; /* Green accent for buttons, highlights */
+  --accent-color: #28a745;
 }
 
 /* ✅ Dark Mode */
-body.dark {
+[data-theme="dark"] {
   --bg-color: #121212;
-  --text-color: #ffffff;
+  --text-color: white;
   --card-bg: #1e1e1e;
   --border-color: #444;
-  --accent-color: #32cd32; /* Brighter green for contrast */
+  --accent-color: #32cd32;
 }
 
-/* ✅ Apply Theme */
+/* ✅ Apply Theme Variables */
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 /* ✅ Navbar Styling */
@@ -29,7 +29,7 @@ body {
   border-bottom: 2px solid var(--border-color);
 }
 
-/* ✅ Links */
+/* ✅ Navbar Links */
 .navbar a {
   color: var(--text-color);
   text-decoration: none;
@@ -107,31 +107,12 @@ button:hover {
 }
 
 /* ✅ Toggle ON (Dark Mode) */
-body.dark .theme-switch .slider {
+[data-theme="dark"] .theme-switch .slider {
   background-color: var(--accent-color);
 }
 
-body.dark .theme-switch .slider:before {
+[data-theme="dark"] .theme-switch .slider:before {
   transform: translateX(26px);
-}
-
-/* Default Theme */
-body {
-  background-color: var(--background);
-  color: var(--text);
-  transition: background 0.3s ease-in-out;
-}
-
-/* Light Theme */
-[data-theme="light"] {
-  --background: white;
-  --text: black;
-}
-
-/* Dark Theme */
-[data-theme="dark"] {
-  --background: black;
-  --text: white;
 }
 
 
