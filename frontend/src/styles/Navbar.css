@@ -1,51 +1,32 @@
-/* ✅ General Navbar Styling */
+/* Navbar Styling */
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #0B0B0B; /* Even darker background for a sleek look */
-  color: white;
-  padding: 15px 25px;
-  box-shadow: 0 4px 15px rgba(0, 255, 127, 0.2);
+  background-color: var(--navbar-bg);
+  color: var(--text);
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   font-size: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ✅ Logo Styling */
-.navbar-logo a {
-  font-size: 24px;
-  font-weight: bold;
-  color: #32cd32; /* Neon Green accent */
+/* Links */
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links a {
+  color: var(--text);
   text-decoration: none;
   transition: color 0.3s ease-in-out;
 }
 
-.navbar-logo a:hover {
-  color: #50fa7b;
-}
-
-/* ✅ Centered Navigation Links */
-.navbar-links {
-  display: flex;
-  gap: 25px;
-}
-
-.navbar-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 5px;
-  transition: all 0.3s ease-in-out;
-}
-
 .navbar-links a:hover {
-  background-color: #1f1f1f;
-  color: #32cd32;
+  color: var(--accent);
 }
 
-/* ✅ Auth Buttons Styling */
+/* Auth Buttons */
 .navbar-auth {
   display: flex;
   gap: 15px;
@@ -54,112 +35,51 @@
 .navbar-auth a,
 .navbar-auth button {
   background-color: transparent;
-  border: 2px solid #32cd32;
-  padding: 10px 15px;
-  border-radius: 8px;
-  color: #32cd32;
+  border: 2px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 5px;
+  color: var(--accent);
   text-decoration: none;
-  font-size: 16px;
-  font-weight: bold;
   cursor: pointer;
+  font-weight: bold;
   transition: all 0.3s ease-in-out;
 }
 
 .navbar-auth a:hover,
 .navbar-auth button:hover {
-  background-color: #32cd32;
+  background-color: var(--accent);
   color: black;
 }
 
-/* ✅ Profile Button */
-.profile-btn {
-  border-color: #ffcc00; /* Gold accent for profile */
-  color: #ffcc00;
-}
-
-.profile-btn:hover {
-  background-color: #ffcc00;
-  color: black;
-}
-
-/* ✅ Logout Button */
-.logout-btn {
-  border-color: red;
-  color: red;
-}
-
-.logout-btn:hover {
-  background-color: red;
-  color: white;
-}
-
-/* ✅ Dark/Light Mode Toggle Switch */
-.theme-switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-  margin-left: 20px;
-}
-
-.theme-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.theme-switch .slider {
-  position: absolute;
+/* Theme Toggle */
+.theme-toggle {
+  border: 2px solid var(--text);
+  background: none;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 5px;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 24px;
+  transition: all 0.3s ease-in-out;
 }
 
-.theme-switch .slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
+.theme-toggle:hover {
+  background-color: var(--text);
+  color: var(--background);
 }
 
-/* ✅ Toggle ON (Dark Mode) */
-.theme-switch input:checked + .slider {
-  background-color: #646cff;
+/* Light and Dark Mode */
+:root {
+  --background: black;
+  --text: white;
+  --accent: #32cd32;
+  --navbar-bg: #111;
 }
 
-.theme-switch input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-
-/* ✅ Mobile Responsive Navbar */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    gap: 15px;
-    padding: 10px 15px;
-  }
-
-  .navbar-links {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .navbar-auth {
-    flex-direction: column;
-    gap: 10px;
-  }
+[data-theme="light"] {
+  --background: white;
+  --text: black;
+  --accent: #32cd32;
+  --navbar-bg: #f5f5f5;
 }
 
 

@@ -1,80 +1,59 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/Profile.css";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+const Profile = ({ user }) => {
+  const [stats, setStats] = useState(null);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
+    const fetchStats = async () => {
       try {
-        const response = await fetch("http://localhost:5002/api/user/profile", {
-          method: "GET",
-          headers: { 
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5002/api/bets/stats", {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Profile fetch failed");
-        }
-
-        setUser(data);
-      } catch (err) {
-        console.error("❌ Profile Fetch Error:", err.message);
-        setError(err.message);
+        setStats(response.data);
+      } catch (error) {
+        console.error("❌ Error fetching betting stats:", error);
       }
     };
 
-    fetchProfile();
-  }, [navigate]);
+    const fetchHistory = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5002/api/bets", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  if (error) return <p className="error">{error}</p>;
-  if (!user) return <p className="loading">Loading profile...</p>;
+        setHistory(response.data);
+      } catch (error) {
+        console.error("❌ Error fetching bet history:", error);
+      }
+    };
+
+    fetchStats();
+    fetchHistory();
+  }, []);
 
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <img
-          src={user.avatar || "/default-avatar.png"}
-          alt="Profile Avatar"
-          className="profile-avatar"
-        />
-        <h2 className="profile-title">Welcome, {user.username}!</h2>
-        <p className="profile-email">📩 {user.email}</p>
-
-        <div className="profile-stats">
-          <p>🏆 <span className="highlight">Betting History:</span> Coming Soon...</p>
-          <p>💰 <span className="highlight">ROI:</span> --$</p>
-          <p>📊 <span className="highlight">Win Rate:</span> --%</p>
-        </div>
-
-        <div className="profile-buttons">
-          <button className="edit-profile-btn">Edit Profile</button>
-          <button className="upload-avatar-btn">Upload Avatar</button>
-        </div>
+        <h2>Welcome, {user.username}!</h2>
+        <p>📩 {user.email}</p>
+        <hr />
+        <h3>Betting History</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={history}>
+            <XAxis dataKey="created_at" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="profit_loss" stroke="#00A878" />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
 };
-
-export default Profile;
-
-
-
-
 
 
 

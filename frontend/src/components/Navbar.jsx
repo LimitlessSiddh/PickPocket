@@ -9,10 +9,11 @@ const Navbar = ({ user, setUser, theme, setTheme }) => {
     window.location.href = "/login";
   };
 
-  // ✅ Toggle Theme Function
+  // Toggle Theme
   const toggleTheme = () => {
-    console.log("🌓 Toggling Theme...");
-    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.body.setAttribute("data-theme", newTheme);
   };
 
   return (
@@ -36,18 +37,17 @@ const Navbar = ({ user, setUser, theme, setTheme }) => {
             <Link to="/register" className="register-btn">📝 Register</Link>
           </>
         )}
+        {/* Theme Toggle Button */}
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode"}
+        </button>
       </div>
-
-      {/* ✅ Toggle Switch for Dark Mode */}
-      <label className="theme-switch">
-        <input type="checkbox" checked={theme === "dark"} onChange={toggleTheme} />
-        <span className="slider"></span>
-      </label>
     </nav>
   );
 };
 
 export default Navbar;
+
 
 
 

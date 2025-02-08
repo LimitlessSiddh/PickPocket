@@ -1,111 +1,129 @@
-/* ✅ Profile Page Styling */
+/* ✅ General Profile Page Styling */
 .profile-container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #0D0D0D;
+  min-height: 100vh;
   padding: 20px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: all 0.3s ease-in-out;
 }
 
 /* ✅ Profile Card */
 .profile-card {
-  background: #1A1A1A;
-  padding: 30px;
-  border-radius: 15px;
+  background: var(--card-background);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
   text-align: center;
+  max-width: 400px;
   width: 100%;
-  max-width: 450px;
-  box-shadow: 0px 4px 12px rgba(0, 255, 170, 0.3);
   transition: transform 0.3s ease-in-out;
 }
 
 .profile-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.03);
 }
 
-/* ✅ Avatar */
+/* ✅ Avatar Styling */
 .profile-avatar {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #00FF88;
-  margin-bottom: 12px;
-  transition: border 0.3s ease-in-out;
+  margin-bottom: 10px;
+  border: 3px solid var(--accent-color);
 }
 
-.profile-avatar:hover {
-  border-color: #00cc77;
-}
-
-/* ✅ Username */
+/* ✅ Profile Info */
 .profile-title {
   font-size: 24px;
   font-weight: bold;
-  color: #00FF88;
-  margin-bottom: 5px;
+  color: var(--accent-color);
 }
 
-/* ✅ Email */
 .profile-email {
   font-size: 16px;
-  color: #B3B3B3;
-  margin-bottom: 15px;
+  color: var(--text-light);
 }
 
-/* ✅ Stats Section */
-.profile-stats {
+/* ✅ Betting Stats */
+.betting-stats {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--stat-background);
+  border-radius: 10px;
+}
+
+.betting-stats h3 {
   font-size: 18px;
-  color: #FFFFFF;
-  margin-top: 10px;
-}
-
-.profile-stats p {
-  margin: 5px 0;
-}
-
-.highlight {
   font-weight: bold;
-  color: #00FF88;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+}
+
+.betting-stats p {
+  font-size: 16px;
+  margin: 5px 0;
+  color: var(--text-color);
+}
+
+.positive {
+  color: #00A878;
+}
+
+.negative {
+  color: red;
 }
 
 /* ✅ Buttons */
-.profile-buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-}
-
-.edit-profile-btn,
-.upload-avatar-btn {
-  background: #00FF88;
-  color: black;
-  font-weight: bold;
-  padding: 10px 15px;
-  border: none;
+.profile-btn {
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 10px 16px;
   border-radius: 5px;
+  font-size: 16px;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  transition: background 0.3s ease-in-out;
 }
 
-.edit-profile-btn:hover,
-.upload-avatar-btn:hover {
-  background: #00cc77;
+.profile-btn:hover {
+  background: var(--button-hover);
 }
 
-/* ✅ Mobile-Friendly */
+/* ✅ Dark & Light Mode Theme */
+:root {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --text-light: rgba(255, 255, 255, 0.7);
+  --card-background: #1A1A1A;
+  --stat-background: rgba(0, 168, 120, 0.2);
+  --accent-color: #00A878;
+  --button-bg: #00A878;
+  --button-text: #000;
+  --button-hover: #00c78a;
+}
+
+[data-theme="light"] {
+  --background-color: #f8f8f8;
+  --text-color: #333;
+  --text-light: rgba(0, 0, 0, 0.6);
+  --card-background: #ffffff;
+  --stat-background: rgba(0, 168, 120, 0.1);
+  --accent-color: #006644;
+  --button-bg: #006644;
+  --button-text: #fff;
+  --button-hover: #008f66;
+}
+
+/* ✅ Responsive Design */
 @media (max-width: 768px) {
   .profile-card {
     width: 90%;
   }
-
-  .profile-buttons {
-    flex-direction: column;
-  }
 }
-
 
   

@@ -11,17 +11,20 @@ import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark"); // Default to dark mode
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
-    console.log("🎨 Current Theme:", theme);
-    document.body.setAttribute("data-theme", theme); // ✅ Set theme attribute on <body>
-    localStorage.setItem("theme", theme); // ✅ Save preference
+    console.log("🎨 Setting theme:", theme);
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      console.log("🔴 No token found, user is not logged in.");
+      return;
+    }
 
     async function fetchProfile() {
       try {
@@ -61,6 +64,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
