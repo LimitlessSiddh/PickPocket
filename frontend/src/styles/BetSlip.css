@@ -1,0 +1,41 @@
+.betslip-container {
+    position: fixed;
+    right: 20px;
+    top: 100px;
+    width: 350px;
+    background: #121212;
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 12px rgba(0, 255, 136, 0.4);
+    transition: all 0.3s ease-in-out;
+    z-index: 100;
+  }
+  
+  .bet-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .bet-item {
+    display: flex;
+    justify-content: space-between;
+    background: #222;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #00ff88;
+    margin-bottom: 6px;
+  }
+  
+  .add-bet-btn {
+    background: #00ff88;
+    color: black;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+  

@@ -1,94 +1,87 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/BettingPage.css";
+import BetSlip from "../components/BetSlip";
 
-const BettingPage = () => {
+const BettingPage = ({ user }) => {
   const [odds, setOdds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_KEY = import.meta.env.VITE_ODDS_API_KEY;
+  const [betSlip, setBetSlip] = useState([]);
+  const API_KEY = "5547690b7fe24b9ec6904dee468982d0";
 
   useEffect(() => {
     const fetchOdds = async () => {
       try {
+        console.log("🔍 Fetching odds...");
         const response = await axios.get(
-          `/oddapi/?apiKey=${API_KEY}&regions=us`,
-          {withCredentials: true}
+          `https://api.the-odds-api.com/v4/sports/upcoming/odds/`,
+          {
+            params: {
+              apiKey: API_KEY,
+              regions: "us",
+              markets: "h2h",
+              oddsFormat: "decimal",
+            },
+          }
         );
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch odds. Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setOdds(data);
+        setOdds(response.data);
       } catch (error) {
-        setError(error.message);
+        console.error("❌ Error fetching odds:", error);
+        setError("Failed to load betting odds.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchOdds();
-  }, [API_KEY]);
+  }, []);
+
+  const addToBetSlip = (bet) => {
+    setBetSlip([...betSlip, bet]);
+  };
 
   return (
     <div className="betting-container">
-      {/* Sidebar for Sports Selection */}
-      <aside className="sidebar">
-        <h3>Sports</h3>
-        <ul className="sports-list">
-          <li>Football</li>
-          <li>Basketball</li>
-          <li>Baseball</li>
-          <li>Hockey</li>
-          <li>Soccer</li>
-          <li>Tennis</li>
-        </ul>
-      </aside>
+      <h2 className="betting-title">Latest Betting Odds</h2>
 
-      {/* Main Betting Content */}
-      <div className="betting-content">
-        <h2 className="betting-title">Latest Betting Odds</h2>
+      {loading && <p className="loading-message">Loading odds...</p>}
+      {error && <p className="error-message">{error}</p>}
 
-        {loading && <p className="loading-message">Loading odds...</p>}
-        {error && <p className="error-message">Error: {error}</p>}
-        {!loading && !error && odds.length === 0 && (
-          <p className="no-odds-message">No odds available at the moment.</p>
-        )}
-
-        {!loading && !error && odds.length > 0 && (
-          <table className="betting-table">
-            <thead>
-              <tr>
-                <th>Sport</th>
-                <th>Bookmaker</th>
-                <th>Odds</th>
+      {!loading && !error && odds.length > 0 && (
+        <table className="betting-table">
+          <thead>
+            <tr>
+              <th>Sport</th>
+              <th>Match</th>
+              <th>Odds</th>
+              <th>Bet</th>
+            </tr>
+          </thead>
+          <tbody>
+            {odds.map((bet, index) => (
+              <tr key={index}>
+                <td>{bet.sport_title}</td>
+                <td>{bet.home_team} vs {bet.away_team}</td>
+                <td>{bet.bookmakers[0]?.markets[0]?.outcomes[0]?.price || "N/A"}</td>
+                <td>
+                  <button onClick={() => addToBetSlip({ match_id: bet.id, teams: `${bet.home_team} vs ${bet.away_team}`, odds: bet.bookmakers[0]?.markets[0]?.outcomes[0]?.price })}>
+                    ➕ Add
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {odds.map((bet, index) => (
-                <tr key={index}>
-                  <td>{bet.sport_title}</td>
-                  <td>{bet.bookmakers[0]?.title || "Unknown"}</td>
-                  <td className="bet-odds">
-                    {bet.bookmakers[0]?.markets[0]?.outcomes[0]?.price || "N/A"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <BetSlip bets={betSlip} setBets={setBetSlip} user={user} />
     </div>
   );
 };
 
 export default BettingPage;
-
-
-
-
 
 
 
