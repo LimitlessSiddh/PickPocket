@@ -1,129 +1,35 @@
-/* ✅ General Profile Page Styling */
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Profile Card */
-.profile-card {
-  background: var(--card-background);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  max-width: 400px;
+.bets-table {
   width: 100%;
-  transition: transform 0.3s ease-in-out;
-}
-
-.profile-card:hover {
-  transform: scale(1.03);
-}
-
-/* ✅ Avatar Styling */
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-  border: 3px solid var(--accent-color);
-}
-
-/* ✅ Profile Info */
-.profile-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--accent-color);
-}
-
-.profile-email {
-  font-size: 16px;
-  color: var(--text-light);
-}
-
-/* ✅ Betting Stats */
-.betting-stats {
+  border-collapse: collapse;
   margin-top: 20px;
-  padding: 15px;
-  background: var(--stat-background);
-  border-radius: 10px;
-}
-
-.betting-stats h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--accent-color);
-  margin-bottom: 10px;
-}
-
-.betting-stats p {
-  font-size: 16px;
-  margin: 5px 0;
+  background: var(--card-bg);
   color: var(--text-color);
 }
 
-.positive {
-  color: #00A878;
+.bets-table th, .bets-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.negative {
+.bets-table th {
+  background: var(--accent-color);
+  color: black;
+}
+
+.bets-table .win {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.bets-table .loss {
   color: red;
+  font-weight: bold;
 }
 
-/* ✅ Buttons */
-.profile-btn {
-  background: var(--button-bg);
-  color: var(--button-text);
-  padding: 10px 16px;
-  border-radius: 5px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-
-.profile-btn:hover {
-  background: var(--button-hover);
-}
-
-/* ✅ Dark & Light Mode Theme */
-:root {
-  --background-color: #121212;
-  --text-color: #ffffff;
-  --text-light: rgba(255, 255, 255, 0.7);
-  --card-background: #1A1A1A;
-  --stat-background: rgba(0, 168, 120, 0.2);
-  --accent-color: #00A878;
-  --button-bg: #00A878;
-  --button-text: #000;
-  --button-hover: #00c78a;
-}
-
-[data-theme="light"] {
-  --background-color: #f8f8f8;
-  --text-color: #333;
-  --text-light: rgba(0, 0, 0, 0.6);
-  --card-background: #ffffff;
-  --stat-background: rgba(0, 168, 120, 0.1);
-  --accent-color: #006644;
-  --button-bg: #006644;
-  --button-text: #fff;
-  --button-hover: #008f66;
-}
-
-/* ✅ Responsive Design */
-@media (max-width: 768px) {
-  .profile-card {
-    width: 90%;
-  }
+.bets-table .pending {
+  color: yellow;
+  font-weight: bold;
 }
 
   

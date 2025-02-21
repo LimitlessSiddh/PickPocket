@@ -1,74 +1,77 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProfileCard from "../components/ProfileCard";
 import "../styles/Profile.css";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const Profile = ({ user }) => {
-  const [stats, setStats] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [bets, setBets] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    
-    const fetchStats = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5002/api/bets/stats", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
 
-        setStats(response.data);
-      } catch (err) {
-        setError("Failed to load betting stats.");
-        console.error("❌ Betting Stats Error:", err);
-      }
-    };
-
-    const fetchHistory = async () => {
+    const fetchBets = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:5002/api/bets", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setHistory(response.data);
+        setBets(response.data);
       } catch (err) {
         setError("Failed to load bet history.");
         console.error("❌ Bet History Error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchStats();
-    fetchHistory();
+    fetchBets();
   }, [user]);
-
-  if (!user) return <p>Loading user data...</p>;
 
   return (
     <div className="profile-container">
-      <ProfileCard user={user} stats={stats} />
+      <h2>Welcome, {user.username}!</h2>
+      <p>📩 {user.email}</p>
+      <hr />
 
-      <div className="profile-history">
-        <h3>📊 Betting Performance</h3>
-        {error && <p className="error-message">{error}</p>}
-
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={history}>
-            <XAxis dataKey="created_at" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="profit_loss" stroke="#00A878" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <h3>📊 Betting History</h3>
+      {error && <p className="error-message">{error}</p>}
+      {loading ? <p>Loading bets...</p> : (
+        <table className="bets-table">
+          <thead>
+            <tr>
+              <th>Match</th>
+              <th>Team Selected</th>
+              <th>Odds</th>
+              <th>Result</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bets.length === 0 ? (
+              <tr><td colSpan="5">No bets placed yet.</td></tr>
+            ) : (
+              bets.map((bet, index) => (
+                <tr key={index}>
+                  <td>{bet.match_id}</td>
+                  <td>{bet.team_selected}</td>
+                  <td>{bet.odds}</td>
+                  <td className={bet.result === "win" ? "win" : bet.result === "loss" ? "loss" : "pending"}>
+                    {bet.result}
+                  </td>
+                  <td>{new Date(bet.created_at).toLocaleString()}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
 
 export default Profile;
-
 
 
   

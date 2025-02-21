@@ -7,27 +7,28 @@ import Leaderboard from "./pages/Leaderboard";
 import BettingPage from "./pages/BettingPage";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import BetSlip from "./components/BetSlip"; // ✅ Import BetSlip Component
+import BetSlip from "./components/BetSlip";
 import axios from "axios";
-import "./index.css"; // ✅ Keep only index.css for global styles
+import "./index.css";
 
 function App() {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-  const [bets, setBets] = useState([]); // ✅ Store bets in slip
-  const [returnPercentage, setReturnPercentage] = useState(0); // ✅ Track return impact
+  const [bets, setBets] = useState([]);
+  const [returnPercentage, setReturnPercentage] = useState(0);
+  const [showBetSlip, setShowBetSlip] = useState(false);
 
-  // ✅ Handle Theme Switching
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // ✅ Fetch User Profile
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("🟢 Stored Token:", token);
+    
     if (!token) return;
-
+  
     async function fetchProfile() {
       try {
         const response = await axios.get("http://localhost:5002/api/user/profile", {
@@ -35,19 +36,18 @@ function App() {
         });
         setUser(response.data);
       } catch (error) {
-        console.error("Profile Fetch Error:", error);
+        console.error("🔴 Profile Fetch Error:", error);
         localStorage.removeItem("token");
         setUser(null);
       }
     }
-
+  
     fetchProfile();
   }, []);
 
   return (
     <Router>
       <Navbar user={user} setUser={setUser} theme={theme} setTheme={setTheme} />
-
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -55,14 +55,18 @@ function App() {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route 
             path="/betting" 
-            element={
+            element={user ? (
               <BettingPage 
+                user={user} 
                 bets={bets} 
                 setBets={setBets} 
                 returnPercentage={returnPercentage} 
                 setReturnPercentage={setReturnPercentage} 
+                setShowBetSlip={setShowBetSlip}
               />
-            } 
+            ) : (
+              <Navigate to="/login" />
+            )}
           />
           <Route path="/register" element={<Register setUser={setUser} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
@@ -70,13 +74,11 @@ function App() {
         </Routes>
       </div>
 
-      {/* ✅ Persistent Bet Slip at the bottom of the screen */}
-      {bets.length > 0 && (
-        <BetSlip bets={bets} setBets={setBets} returnPercentage={returnPercentage} />
+      {user && showBetSlip && (
+        <BetSlip bets={bets} setBets={setBets} user={user} setShowBetSlip={setShowBetSlip} />
       )}
     </Router>
   );
 }
 
 export default App;
-
