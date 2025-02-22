@@ -3,12 +3,20 @@ import axios from "axios";
 import "../styles/BetSlip.css";
 
 const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
-  const [betType, setBetType] = useState("single"); // "single" or "parlay"
+  console.log("🟢 User received in BetSlip:", user);
+  const [betType, setBetType] = useState("single");
   const [totalMultiplier, setTotalMultiplier] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ Calculate parlay multiplier
+  // ✅ Retrieve token from localStorage
+  const token = localStorage.getItem("token");
+
+  // ✅ Debugging: Check if `user` and `token` exist
+  console.log("🟢 User in BetSlip:", user);
+  console.log("🟢 Token in localStorage:", token);
+ 
+
   useEffect(() => {
     if (betType === "parlay" && bets.length > 1) {
       const multiplier = bets.reduce((acc, bet) => acc * parseFloat(bet.odds), 1);
@@ -18,52 +26,60 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
     }
   }, [bets, betType]);
 
-  // ✅ Remove a bet from the slip
   const handleRemoveBet = (index) => {
     const updatedBets = [...bets];
     updatedBets.splice(index, 1);
     setBets(updatedBets);
 
-    // ✅ Hide Bet Slip if no bets left
     if (updatedBets.length === 0) {
       setShowBetSlip(false);
     }
   };
 
-  // ✅ Submit bets to the backend
   const handleSubmitBets = async () => {
-    if (!user) {
+    console.log("🟢 Submitting Bet - Checking user and token...");
+  
+    const token = localStorage.getItem("token");
+    console.log("🟢 Token in localStorage:", token);
+    console.log("🟢 User in BetSlip:", user);
+  
+    if (!token) {
+      console.error("🔴 No token found in local storage.");
       setError("You must be logged in to place a bet.");
       return;
     }
+  
+    if (!user) {  // ✅ Ensure user is not null before submitting
+      console.error("🔴 User state is NULL.");
+      setError("You must be logged in to place a bet.");
+      return;
+    }
+  
     if (bets.length === 0) {
+      console.error("🔴 No bets in slip.");
       setError("Your bet slip is empty.");
       return;
     }
-
+  
     setIsSubmitting(true);
     setError(null);
-
+  
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Authentication error. Please log in again.");
-        return;
-      }
-
       const formattedBets = bets.map((bet) => ({
         match_id: bet.match_id,
         team_selected: bet.team_selected,
         odds: bet.odds,
       }));
-
+  
+      console.log("🟢 Sending API request with:", { betType, bets: formattedBets });
+  
       const response = await axios.post(
         "http://localhost:5002/api/bets",
         { betType, bets: formattedBets },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
-
-      console.log("✅ Bet submitted:", response.data);
+  
+      console.log("✅ Bet submitted successfully:", response.data);
       setBets([]); // ✅ Clear bet slip after submission
       setShowBetSlip(false); // ✅ Hide Bet Slip after submission
     } catch (err) {

@@ -24,16 +24,20 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("🟢 Stored Token:", token);
-    
-    if (!token) return;
+    console.log("🟢 Stored Token:", localStorage.getItem("token"));
+  
+    if (!localStorage.getItem("token")) {
+      console.log("🔴 No token found, user is NULL.");
+      return;
+    }
   
     async function fetchProfile() {
       try {
         const response = await axios.get("http://localhost:5002/api/user/profile", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
+  
+        console.log("✅ User data fetched:", response.data);
         setUser(response.data);
       } catch (error) {
         console.error("🔴 Profile Fetch Error:", error);
@@ -44,6 +48,10 @@ function App() {
   
     fetchProfile();
   }, []);
+  
+  useEffect(() => {
+    console.log("🟢 Current User in State:", user);
+  }, [user]); // ✅ This will print every time user state updates
 
   return (
     <Router>

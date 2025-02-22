@@ -5,6 +5,8 @@ import pool from "./config/db.js";
 import authRoutes from "./routes/auth.js"; // ✅ Import auth routes
 import betRoutes from "./routes/bets.js"; // ✅ Import bets route
 import userRoutes from "./routes/user.js"; // ✅ Import user route
+import leaderboardRoutes from "./routes/leaderboard.js";
+
 
 dotenv.config();
 
@@ -16,6 +18,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/bets", betRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 // ✅ Test Route
 app.get("/", (req, res) => {

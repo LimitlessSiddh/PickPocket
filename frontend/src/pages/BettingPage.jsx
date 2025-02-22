@@ -98,7 +98,7 @@ const BettingPage = ({ user }) => {
 
       {/* ✅ Floating Bet Slip (Only visible when bets are added) */}
       {showBetSlip && (
-        <BetSlip bets={betSlip} setBets={setBetSlip} setShowBetSlip={setShowBetSlip} />
+       <BetSlip bets={betSlip} setBets={setBetSlip} user={user} setShowBetSlip={setShowBetSlip} />
       )}
     </div>
   );

@@ -24,7 +24,7 @@ const Login = ({ setUser }) => {
 
       console.log("✅ Server response:", response.data);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.token) {
         const { token, user } = response.data;
 
         // ✅ Store token and user info in local storage
@@ -32,13 +32,16 @@ const Login = ({ setUser }) => {
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
 
+        console.log("🟢 Token Saved:", localStorage.getItem("token"));
+
         // ✅ Redirect user to profile after successful login
         navigate("/profile");
       } else {
+        console.error("❌ No token received.");
         setError("Invalid email or password");
       }
     } catch (err) {
-      console.error("❌ Login error:", err);
+      console.error("❌ Login error:", err.response?.data || err);
       setError("Invalid email or password");
     } finally {
       setLoading(false);
@@ -90,6 +93,3 @@ const Login = ({ setUser }) => {
 };
 
 export default Login;
-
-
-

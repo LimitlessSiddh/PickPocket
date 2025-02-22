@@ -10,6 +10,14 @@ const router = express.Router();
  * - Stores bets as "pending" until results are updated
  */
 router.post("/", authMiddleware, async (req, res) => {
+  console.log("🔍 Incoming Bet Request...");
+  console.log("🟢 User ID from Middleware:", req.user?.id || "NO USER ID FOUND");
+
+  if (!req.user || !req.user.id) {
+    console.log("❌ No valid user detected.");
+    return res.status(401).json({ message: "You must be logged in to place a bet." });
+  }
+
   try {
     const { betType, bets } = req.body;
     const userId = req.user.id;
@@ -24,6 +32,7 @@ router.post("/", authMiddleware, async (req, res) => {
       const { match_id, team_selected, odds } = bet;
 
       if (!match_id || !team_selected || !odds) {
+        console.log("❌ Missing required fields:", { match_id, team_selected, odds });
         return res.status(400).json({ message: "Invalid bet format. Missing required fields." });
       }
 
@@ -34,6 +43,7 @@ router.post("/", authMiddleware, async (req, res) => {
       );
 
       if (existingBet.rows.length > 0) {
+        console.log("❌ Duplicate bet detected for user", userId);
         return res.status(400).json({ message: "You have already placed a bet on this match." });
       }
 
@@ -47,6 +57,7 @@ router.post("/", authMiddleware, async (req, res) => {
       insertedBets.push(newBet.rows[0]);
     }
 
+    console.log("✅ Bets Placed Successfully:", insertedBets);
     res.status(201).json({ message: "Bets placed successfully!", bets: insertedBets });
   } catch (error) {
     console.error("❌ Betting Error:", error);
@@ -56,7 +67,6 @@ router.post("/", authMiddleware, async (req, res) => {
 
 /**
  * ✅ Get User's Betting Stats
- * - Fetch total bets, win/loss count, and ROI (Return on Investment)
  */
 router.get("/stats", authMiddleware, async (req, res) => {
   try {
@@ -69,14 +79,19 @@ router.get("/stats", authMiddleware, async (req, res) => {
         SUM(CASE WHEN result = 'loss' THEN 1 ELSE 0 END) AS losses,
         COALESCE(
           ROUND(
-            100.0 * SUM(CASE WHEN result = 'win' THEN (odds - 1) ELSE 0 END) / NULLIF(COUNT(*), 0), 
+            100.0 * (SUM(CASE WHEN result = 'win' THEN (odds - 1) ELSE 0 END) - SUM(CASE WHEN result = 'loss' THEN 1 ELSE 0 END)) / NULLIF(COUNT(*), 0), 
             2
           ), 0
         ) AS roi
       FROM bets WHERE user_id = $1
     `, [userId]);
 
-    res.json(statsQuery.rows[0]);
+    res.json({
+      total_bets: statsQuery.rows[0].total_bets,
+      wins: statsQuery.rows[0].wins,
+      losses: statsQuery.rows[0].losses,
+      roi: statsQuery.rows[0].roi
+    });
   } catch (error) {
     console.error("❌ Betting Stats Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
@@ -85,7 +100,6 @@ router.get("/stats", authMiddleware, async (req, res) => {
 
 /**
  * ✅ Update Bet Result (Win/Loss)
- * - Updates a bet’s result and recalculates user stats
  */
 router.put("/:betId/result", authMiddleware, async (req, res) => {
   try {
@@ -119,28 +133,42 @@ router.put("/:betId/result", authMiddleware, async (req, res) => {
       [result, profitLoss, betId]
     );
 
-    // ✅ Recalculate user ROI after update
-    const updatedStats = await pool.query(`
-      SELECT 
-        COUNT(*) AS total_bets,
-        SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) AS wins,
-        SUM(CASE WHEN result = 'loss' THEN 1 ELSE 0 END) AS losses,
-        COALESCE(
-          ROUND(
-            100.0 * SUM(CASE WHEN result = 'win' THEN (odds - 1) ELSE 0 END) / NULLIF(COUNT(*), 0), 
-            2
-          ), 0
-        ) AS roi
-      FROM bets WHERE user_id = $1
-    `, [userId]);
+    // ✅ Fetch User Streak Data
+    const userQuery = await pool.query("SELECT current_win_streak, current_loss_streak, longest_win_streak, longest_loss_streak FROM users WHERE id = $1", [userId]);
+    const user = userQuery.rows[0];
+
+    let newWinStreak = user.current_win_streak;
+    let newLossStreak = user.current_loss_streak;
+    let longestWinStreak = user.longest_win_streak;
+    let longestLossStreak = user.longest_loss_streak;
+
+    if (result === "win") {
+      newWinStreak += 1;
+      newLossStreak = 0; // Reset loss streak
+      longestWinStreak = Math.max(longestWinStreak, newWinStreak);
+    } else if (result === "loss") {
+      newLossStreak += 1;
+      newWinStreak = 0; // Reset win streak
+      longestLossStreak = Math.max(longestLossStreak, newLossStreak);
+    }
+
+    // ✅ Update Streaks in User Table
+    await pool.query(
+      "UPDATE users SET current_win_streak = $1, current_loss_streak = $2, longest_win_streak = $3, longest_loss_streak = $4 WHERE id = $5",
+      [newWinStreak, newLossStreak, longestWinStreak, longestLossStreak, userId]
+    );
+
+    // ✅ Fetch updated streak data
+    const updatedUser = await pool.query("SELECT current_win_streak, current_loss_streak, longest_win_streak, longest_loss_streak FROM users WHERE id = $1", [userId]);
 
     res.json({
       message: "Bet updated successfully!",
       betId,
       result,
       profitLoss,
-      updatedStats: updatedStats.rows[0]
+      streaks: updatedUser.rows[0]
     });
+
   } catch (error) {
     console.error("❌ Error updating bet result:", error);
     res.status(500).json({ message: "Server error. Try again later." });
@@ -149,7 +177,6 @@ router.put("/:betId/result", authMiddleware, async (req, res) => {
 
 /**
  * ✅ Get All Bets (For User)
- * - Fetch all bets the user has placed
  */
 router.get("/", authMiddleware, async (req, res) => {
   try {
