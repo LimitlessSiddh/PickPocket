@@ -55,22 +55,32 @@
     border-radius: 8px;
     font-weight: bold;
     color: #00ff7f;
+    text-align: center;
   }
   
   .leader-row {
     display: flex;
     justify-content: space-between;
+    align-items: center; /* ✅ Center align all rows */
     padding: 12px;
     margin-top: 8px;
     background: #111;
     border-radius: 8px;
     transition: 0.3s;
     color: white;
+    text-align: center;
   }
   
   .leader-row:hover {
     background: #00ff7f;
     color: black;
+  }
+  
+  /* ✅ Fix column alignment */
+  .leaderboard-header span,
+  .leader-row span {
+    flex: 1;  /* Each column takes equal space */
+    text-align: center; /* ✅ Ensure all text is centered */
   }
   
   .rank-number {

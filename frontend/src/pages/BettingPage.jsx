@@ -3,12 +3,10 @@ import axios from "axios";
 import "../styles/BettingPage.css";
 import BetSlip from "../components/BetSlip";
 
-const BettingPage = ({ user }) => {
+const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
   const [odds, setOdds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [betSlip, setBetSlip] = useState([]);
-  const [showBetSlip, setShowBetSlip] = useState(false); // ✅ Hide bet slip initially
   const API_KEY = "5547690b7fe24b9ec6904dee468982d0";
 
   useEffect(() => {
@@ -16,7 +14,7 @@ const BettingPage = ({ user }) => {
       try {
         console.log("🔍 Fetching odds...");
         const response = await axios.get(
-          `https://api.the-odds-api.com/v4/sports/upcoming/odds/`,
+          `https://api.the-odds-api.com/v4/sports/basketball_nba/odds/`,
           {
             params: {
               apiKey: API_KEY,
@@ -40,24 +38,22 @@ const BettingPage = ({ user }) => {
     fetchOdds();
   }, []);
 
-  // ✅ Add bet to slip and show Bet Slip
-  const addToBetSlip = (bet) => {
+  const addToBetSlip = (match, outcome) => {
     if (!user) {
       alert("You must be logged in to place a bet.");
       return;
     }
 
-    // Prevent duplicate selections
-    const isDuplicate = betSlip.some(
-      (b) => b.match_id === bet.match_id && b.team_selected === bet.team_selected
-    );
-    if (isDuplicate) {
-      alert("You have already selected this bet.");
-      return;
-    }
+    const newBet = {
+      match_id: match.id,
+      team_selected: outcome.name,
+      odds: outcome.price,
+      sport_key: match.sport_key,
+      teams: `${match.home_team} vs ${match.away_team}`,
+    };
 
-    setBetSlip([...betSlip, bet]);
-    setShowBetSlip(true); // ✅ Show Bet Slip when a bet is added
+    setBets([...bets, newBet]);
+    setShowBetSlip(true);
   };
 
   return (
@@ -69,23 +65,17 @@ const BettingPage = ({ user }) => {
 
       {!loading && !error && odds.length > 0 && (
         <div className="odds-grid">
-          {odds.map((bet, index) => (
-            <div key={index} className="bet-card">
-              <h3 className="sport-title">{bet.sport_title}</h3>
-              <p className="match-title">{bet.home_team} vs {bet.away_team}</p>
-              <p className="bookmaker-name">{bet.bookmakers[0]?.title || "N/A"}</p>
+          {odds.map((match) => (
+            <div key={match.id} className="bet-card">
+              <h3 className="sport-title">{match.sport_title}</h3>
+              <p className="match-title">{match.home_team} vs {match.away_team}</p>
               
               <div className="odds-container">
-                {bet.bookmakers[0]?.markets[0]?.outcomes.map((outcome, i) => (
+                {match.bookmakers[0]?.markets[0]?.outcomes.map((outcome) => (
                   <button 
-                    key={i} 
+                    key={outcome.name} 
                     className="bet-button"
-                    onClick={() => addToBetSlip({
-                      match_id: bet.id,
-                      team_selected: outcome.name,
-                      odds: outcome.price,
-                      teams: `${bet.home_team} vs ${bet.away_team}`,
-                    })}
+                    onClick={() => addToBetSlip(match, outcome)}
                   >
                     {outcome.name}: {outcome.price}
                   </button>
@@ -96,10 +86,7 @@ const BettingPage = ({ user }) => {
         </div>
       )}
 
-      {/* ✅ Floating Bet Slip (Only visible when bets are added) */}
-      {showBetSlip && (
-       <BetSlip bets={betSlip} setBets={setBetSlip} user={user} setShowBetSlip={setShowBetSlip} />
-      )}
+      {user && <BetSlip bets={bets} setBets={setBets} user={user} setShowBetSlip={setShowBetSlip} />}
     </div>
   );
 };

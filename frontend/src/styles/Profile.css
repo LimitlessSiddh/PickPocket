@@ -1,148 +1,106 @@
-/* 🎨 General Profile Styling */
+/* Profile Page Styling */
+
 .profile-container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 20px;
-  background: #0a0a0a; /* Deep black background */
-  border-radius: 15px;
-  border: 2px solid #00ff7f; /* Neon green border */
+  background-color: #000;
   color: #fff;
-  box-shadow: 0px 5px 15px rgba(0, 255, 127, 0.2);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
 }
 
-/* 🏆 Profile Header */
+/* Profile Header */
 .profile-header {
   display: flex;
   align-items: center;
-  background: #121212;
-  padding: 25px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  border: 2px solid #00ff7f;
+  width: 100%;
+  padding: 20px;
+  background: #111;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 255, 127, 0.1);
 }
 
 .profile-avatar {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  object-fit: cover;
   border: 3px solid #00ff7f;
-  margin-right: 20px;
 }
 
-.profile-info h2 {
-  font-size: 26px;
+.profile-info {
+  margin-left: 15px;
+}
+
+.profile-username {
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #00ff7f;
 }
 
 .profile-rank {
+  font-size: 1rem;
   color: #00ff7f;
-  font-size: 18px;
-  font-weight: bold;
 }
 
-/* 📊 Stats Section */
+/* Stats Section */
 .profile-stats {
   display: flex;
   justify-content: space-between;
-  gap: 15px;
-  margin: 25px 0;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  width: 100%;
 }
 
 .stat-card {
   flex: 1;
-  background: #1b1b1b;
-  padding: 20px;
-  border-radius: 12px;
+  min-width: 200px;
+  padding: 15px;
+  background: #222;
+  border-radius: 10px;
   text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  border: 2px solid #00ff7f;
-  transition: 0.3s ease-in-out;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0, 255, 127, 0.1);
 }
 
-.stat-card:hover {
-  background: #00ff7f;
-  color: #0a0a0a;
-}
-
-.win-card {
-  color: #00ff7f;
-}
-
-.loss-card {
-  color: #ff4d4d;
-}
-
-.roi-card {
-  color: #00a8ff;
-}
-
-/* 💰 Betting History */
+/* Betting History */
 .bet-history {
-  margin-top: 30px;
-  background: #1b1b1b;
-  padding: 20px;
-  border-radius: 12px;
-  border: 2px solid #00ff7f;
-}
-
-.bet-history h3 {
-  color: #00ff7f;
-  font-size: 22px;
-  margin-bottom: 10px;
+  margin-top: 20px;
+  width: 100%;
 }
 
 .history-table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
+  margin-top: 15px;
 }
 
-.history-table th, .history-table td {
-  padding: 14px;
-  text-align: center;
+.history-table th,
+.history-table td {
+  padding: 12px;
   border-bottom: 1px solid #444;
+  text-align: center;
 }
 
 .history-table th {
-  background: #0d0d0d;
-  color: #00ff7f;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.bet-result.win {
+  background: #111;
   color: #00ff7f;
 }
 
-.bet-result.loss {
-  color: #ff4d4d;
+.history-table tr:nth-child(even) {
+  background: #181818;
 }
 
-.profit-loss {
-  font-weight: bold;
+.history-table tr:nth-child(odd) {
+  background: #222;
 }
 
-/* 📈 Performance Chart */
+/* Performance Chart */
 .performance-chart {
   margin-top: 30px;
-  background: #1b1b1b;
+  width: 100%;
+  background: #111;
   padding: 20px;
-  border-radius: 12px;
-  border: 2px solid #00ff7f;
-}
-
-.performance-chart h3 {
-  color: #00ff7f;
-  text-align: center;
-  font-size: 22px;
-}
-
-.streak-indicator {
-  font-size: 16px;
-  font-weight: bold;
-  margin-left: 10px;
+  border-radius: 10px;
 }

@@ -40,16 +40,13 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
     console.log("🟢 Submitting Bet - Checking user and token...");
   
     const token = localStorage.getItem("token");
-    console.log("🟢 Token in localStorage:", token);
-    console.log("🟢 User in BetSlip:", user);
-  
     if (!token) {
       console.error("🔴 No token found in local storage.");
       setError("You must be logged in to place a bet.");
       return;
     }
   
-    if (!user) {  // ✅ Ensure user is not null before submitting
+    if (!user) {
       console.error("🔴 User state is NULL.");
       setError("You must be logged in to place a bet.");
       return;
@@ -65,11 +62,39 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
     setError(null);
   
     try {
-      const formattedBets = bets.map((bet) => ({
-        match_id: bet.match_id,
-        team_selected: bet.team_selected,
-        odds: bet.odds,
-      }));
+      // Fetch latest match data to get correct match_id
+      const sportKey = bets[0].sport_key; // Assume all bets are in the same sport
+      const matchResponse = await axios.get(
+        `https://api.the-odds-api.com/v4/sports/${sportKey}/scores/`,
+        { params: { apiKey: "5547690b7fe24b9ec6904dee468982d0" } }
+      );
+  
+      const matchData = matchResponse.data;
+      console.log("🟢 API Match Data:", matchData);
+  
+      const formattedBets = bets.map((bet) => {
+        const match = matchData.find(
+          (m) => m.home_team === bet.team_selected || m.away_team === bet.team_selected
+        );
+  
+        if (!match) {
+          console.error(`❌ No match found for ${bet.team_selected}`);
+          setError(`No valid match found for ${bet.team_selected}`);
+          return null;
+        }
+  
+        return {
+          match_id: match.id,
+          team_selected: bet.team_selected,
+          odds: bet.odds,
+          sport_key: sportKey,
+        };
+      }).filter(Boolean);
+  
+      if (formattedBets.length === 0) {
+        setError("No valid bets found. Please try again.");
+        return;
+      }
   
       console.log("🟢 Sending API request with:", { betType, bets: formattedBets });
   
@@ -80,8 +105,8 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
       );
   
       console.log("✅ Bet submitted successfully:", response.data);
-      setBets([]); // ✅ Clear bet slip after submission
-      setShowBetSlip(false); // ✅ Hide Bet Slip after submission
+      setBets([]);
+      setShowBetSlip(false);
     } catch (err) {
       console.error("❌ Bet submission error:", err.response?.data || err);
       setError("Failed to submit bet. Try again.");

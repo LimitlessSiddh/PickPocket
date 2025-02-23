@@ -1,20 +1,22 @@
 import express from "express";
 import pool from "../config/db.js";
-import authMiddleware from "../middleware/authMiddleware.js"; // ✅ Protect routes
+import authMiddleware from "../middleware/authMiddleware.js";
+import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = express.Router();
+const ODDS_API_KEY = process.env.ODDS_API_KEY;
+const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
 
 /**
  * ✅ Place a Bet
- * - Prevents duplicate bets on the same match
- * - Stores bets as "pending" until results are updated
  */
 router.post("/", authMiddleware, async (req, res) => {
   console.log("🔍 Incoming Bet Request...");
-  console.log("🟢 User ID from Middleware:", req.user?.id || "NO USER ID FOUND");
 
   if (!req.user || !req.user.id) {
-    console.log("❌ No valid user detected.");
     return res.status(401).json({ message: "You must be logged in to place a bet." });
   }
 
@@ -29,35 +31,21 @@ router.post("/", authMiddleware, async (req, res) => {
     const insertedBets = [];
 
     for (const bet of bets) {
-      const { match_id, team_selected, odds } = bet;
+      const { match_id, team_selected, odds, sport_key } = bet;
 
-      if (!match_id || !team_selected || !odds) {
-        console.log("❌ Missing required fields:", { match_id, team_selected, odds });
+      if (!match_id || !team_selected || !odds || !sport_key) {
         return res.status(400).json({ message: "Invalid bet format. Missing required fields." });
       }
 
-      // 🚨 Prevent duplicate bets on the same match by the same user
-      const existingBet = await pool.query(
-        "SELECT * FROM bets WHERE user_id = $1 AND match_id = $2 AND team_selected = $3",
-        [userId, match_id, team_selected]
-      );
-
-      if (existingBet.rows.length > 0) {
-        console.log("❌ Duplicate bet detected for user", userId);
-        return res.status(400).json({ message: "You have already placed a bet on this match." });
-      }
-
-      // ✅ Insert new bet (initially "pending" status)
       const newBet = await pool.query(
-        `INSERT INTO bets (user_id, match_id, team_selected, odds, result) 
-         VALUES ($1, $2, $3, $4, 'pending') RETURNING *`,
-        [userId, match_id, team_selected, odds]
+        `INSERT INTO bets (user_id, match_id, team_selected, odds, sport_key, result) 
+         VALUES ($1, $2, $3, $4, $5, 'pending') RETURNING *`,
+        [userId, match_id, team_selected, odds, sport_key]
       );
 
       insertedBets.push(newBet.rows[0]);
     }
 
-    console.log("✅ Bets Placed Successfully:", insertedBets);
     res.status(201).json({ message: "Bets placed successfully!", bets: insertedBets });
   } catch (error) {
     console.error("❌ Betting Error:", error);
@@ -86,91 +74,9 @@ router.get("/stats", authMiddleware, async (req, res) => {
       FROM bets WHERE user_id = $1
     `, [userId]);
 
-    res.json({
-      total_bets: statsQuery.rows[0].total_bets,
-      wins: statsQuery.rows[0].wins,
-      losses: statsQuery.rows[0].losses,
-      roi: statsQuery.rows[0].roi
-    });
+    res.json(statsQuery.rows[0]);
   } catch (error) {
     console.error("❌ Betting Stats Error:", error);
-    res.status(500).json({ message: "Server error. Try again later." });
-  }
-});
-
-/**
- * ✅ Update Bet Result (Win/Loss)
- */
-router.put("/:betId/result", authMiddleware, async (req, res) => {
-  try {
-    const { result } = req.body;
-    const { betId } = req.params;
-    const userId = req.user.id;
-
-    if (!["win", "loss"].includes(result)) {
-      return res.status(400).json({ message: "Invalid result. Must be 'win' or 'loss'." });
-    }
-
-    // ✅ Fetch bet details
-    const betQuery = await pool.query("SELECT * FROM bets WHERE id = $1 AND user_id = $2", [betId, userId]);
-    if (betQuery.rows.length === 0) {
-      return res.status(404).json({ message: "Bet not found" });
-    }
-
-    const bet = betQuery.rows[0];
-    let profitLoss = 0;
-
-    // ✅ Calculate Profit/Loss
-    if (result === "win") {
-      profitLoss = (bet.odds - 1) * 100; // ROI-based profit calculation
-    } else if (result === "loss") {
-      profitLoss = -100; // Assume full loss scenario
-    }
-
-    // ✅ Update Bet Result & Profit/Loss
-    await pool.query(
-      "UPDATE bets SET result = $1, profit_loss = $2 WHERE id = $3",
-      [result, profitLoss, betId]
-    );
-
-    // ✅ Fetch User Streak Data
-    const userQuery = await pool.query("SELECT current_win_streak, current_loss_streak, longest_win_streak, longest_loss_streak FROM users WHERE id = $1", [userId]);
-    const user = userQuery.rows[0];
-
-    let newWinStreak = user.current_win_streak;
-    let newLossStreak = user.current_loss_streak;
-    let longestWinStreak = user.longest_win_streak;
-    let longestLossStreak = user.longest_loss_streak;
-
-    if (result === "win") {
-      newWinStreak += 1;
-      newLossStreak = 0; // Reset loss streak
-      longestWinStreak = Math.max(longestWinStreak, newWinStreak);
-    } else if (result === "loss") {
-      newLossStreak += 1;
-      newWinStreak = 0; // Reset win streak
-      longestLossStreak = Math.max(longestLossStreak, newLossStreak);
-    }
-
-    // ✅ Update Streaks in User Table
-    await pool.query(
-      "UPDATE users SET current_win_streak = $1, current_loss_streak = $2, longest_win_streak = $3, longest_loss_streak = $4 WHERE id = $5",
-      [newWinStreak, newLossStreak, longestWinStreak, longestLossStreak, userId]
-    );
-
-    // ✅ Fetch updated streak data
-    const updatedUser = await pool.query("SELECT current_win_streak, current_loss_streak, longest_win_streak, longest_loss_streak FROM users WHERE id = $1", [userId]);
-
-    res.json({
-      message: "Bet updated successfully!",
-      betId,
-      result,
-      profitLoss,
-      streaks: updatedUser.rows[0]
-    });
-
-  } catch (error) {
-    console.error("❌ Error updating bet result:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });
@@ -182,9 +88,10 @@ router.get("/", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
     const betsQuery = await pool.query(
-      "SELECT * FROM bets WHERE user_id = $1 ORDER BY created_at DESC", 
+      "SELECT * FROM bets WHERE user_id = $1 ORDER BY created_at DESC",
       [userId]
     );
+
     res.json(betsQuery.rows);
   } catch (error) {
     console.error("❌ Error fetching bets:", error);
@@ -192,4 +99,74 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * ✅ Validate & Update Bets from API
+ */
+async function validateBets() {
+  try {
+    console.log("🔄 Running bet validation...");
+
+    const pendingBets = await pool.query("SELECT * FROM bets WHERE result = 'pending'");
+    if (pendingBets.rows.length === 0) {
+      console.log("✅ No pending bets to validate.");
+      return { message: "No pending bets to validate." };
+    }
+
+    let updatedBets = [];
+
+    for (let bet of pendingBets.rows) {
+      if (!bet.sport_key) {
+        console.error(`❌ Missing sport_key for bet ID ${bet.id}`);
+        continue;
+      }
+
+      try {
+        console.log("🔄 Fetching results for sport:", bet.sport_key);
+        const response = await axios.get(
+          `${ODDS_API_URL}${bet.sport_key}/scores/`,
+          { params: { apiKey: ODDS_API_KEY } }
+        );
+
+        const matchResults = response.data;
+        const match = matchResults.find((m) => m.id === bet.match_id);
+
+        if (!match || !match.completed) {
+          console.log(`⏳ Match ${bet.match_id} is not completed yet.`);
+          continue;
+        }
+
+        console.log(`✅ Match ${bet.match_id} is completed. Checking winner...`);
+        const homeScore = match.scores?.find((s) => s.name === match.home_team)?.score;
+        const awayScore = match.scores?.find((s) => s.name === match.away_team)?.score;
+
+        let winningTeam = homeScore > awayScore ? match.home_team : match.away_team;
+        let matchResult = winningTeam === bet.team_selected ? "win" : "loss";
+
+        console.log(`🎯 Bet ID ${bet.id} - Bet on: ${bet.team_selected} | Result: ${matchResult}`);
+
+        let profitLoss = matchResult === "win" ? (bet.odds - 1) * 100 : -100;
+
+        await pool.query(
+          "UPDATE bets SET result = $1, profit_loss = $2 WHERE id = $3",
+          [matchResult, profitLoss, bet.id]
+        );
+
+        updatedBets.push({ id: bet.id, result: matchResult, profitLoss });
+
+      } catch (error) {
+        console.error(`❌ Error validating bet ${bet.id}:`, error);
+      }
+    }
+
+    console.log("✅ Bets validated:", updatedBets);
+    return { message: "Bets validated successfully!", updatedBets };
+
+  } catch (error) {
+    console.error("❌ Error validating bets:", error);
+    return { message: "Server error during bet validation." };
+  }
+}
+
+// ✅ Export Router & Function (Fix Export)
 export default router;
+export { validateBets };

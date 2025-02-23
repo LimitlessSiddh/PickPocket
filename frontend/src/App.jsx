@@ -30,28 +30,46 @@ function App() {
       console.log("🔴 No token found, user is NULL.");
       return;
     }
-  
+
     async function fetchProfile() {
       try {
         const response = await axios.get("http://localhost:5002/api/user/profile", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
-  
+
         console.log("✅ User data fetched:", response.data);
         setUser(response.data);
+
+        // ✅ Fetch user's bet history to sync frontend
+        fetchUserBets();
       } catch (error) {
         console.error("🔴 Profile Fetch Error:", error);
         localStorage.removeItem("token");
         setUser(null);
       }
     }
-  
+
     fetchProfile();
   }, []);
-  
+
+  const fetchUserBets = async () => {
+    if (!user) return;
+
+    try {
+      const response = await axios.get("http://localhost:5002/api/bets", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      console.log("✅ User Bets Fetched:", response.data);
+      setBets(response.data);
+    } catch (error) {
+      console.error("❌ Error fetching bets:", error);
+    }
+  };
+
   useEffect(() => {
     console.log("🟢 Current User in State:", user);
-  }, [user]); // ✅ This will print every time user state updates
+  }, [user]);
 
   return (
     <Router>
@@ -59,7 +77,7 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={user ? <Profile user={user} /> : <Navigate to="/login" />} />
+          <Route path="/profile" element={user ? <Profile user={user} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route 
             path="/betting" 
@@ -71,6 +89,7 @@ function App() {
                 returnPercentage={returnPercentage} 
                 setReturnPercentage={setReturnPercentage} 
                 setShowBetSlip={setShowBetSlip}
+                fetchUserBets={fetchUserBets}
               />
             ) : (
               <Navigate to="/login" />
@@ -83,7 +102,7 @@ function App() {
       </div>
 
       {user && showBetSlip && (
-        <BetSlip bets={bets} setBets={setBets} user={user} setShowBetSlip={setShowBetSlip} />
+        <BetSlip bets={bets} setBets={setBets} user={user} setShowBetSlip={setShowBetSlip} fetchUserBets={fetchUserBets} />
       )}
     </Router>
   );
