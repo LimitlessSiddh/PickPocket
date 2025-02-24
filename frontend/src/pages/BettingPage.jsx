@@ -7,10 +7,18 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
   const [odds, setOdds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastFetched, setLastFetched] = useState(0);
   const API_KEY = "5547690b7fe24b9ec6904dee468982d0";
+  const CACHE_DURATION = 300000; // ✅ Cache odds for 5 minutes (300,000 ms)
 
   useEffect(() => {
     const fetchOdds = async () => {
+      const now = Date.now();
+      if (now - lastFetched < CACHE_DURATION) {
+        console.log("⏳ Using cached odds data.");
+        return;
+      }
+
       try {
         console.log("🔍 Fetching odds...");
         const response = await axios.get(
@@ -25,7 +33,14 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
           }
         );
 
+        if (response.data.error_code === "OUT_OF_USAGE_CREDITS") {
+          console.error("❌ API Quota Exceeded. Stopping requests.");
+          setError("API quota exceeded. Try again later.");
+          return;
+        }
+
         setOdds(response.data);
+        setLastFetched(now);
         console.log("✅ Odds Fetched:", response.data);
       } catch (error) {
         console.error("❌ Error fetching odds:", error);
@@ -36,7 +51,7 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
     };
 
     fetchOdds();
-  }, []);
+  }, [lastFetched]);
 
   const addToBetSlip = (match, outcome) => {
     if (!user) {
@@ -69,11 +84,11 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
             <div key={match.id} className="bet-card">
               <h3 className="sport-title">{match.sport_title}</h3>
               <p className="match-title">{match.home_team} vs {match.away_team}</p>
-              
+
               <div className="odds-container">
                 {match.bookmakers[0]?.markets[0]?.outcomes.map((outcome) => (
-                  <button 
-                    key={outcome.name} 
+                  <button
+                    key={outcome.name}
                     className="bet-button"
                     onClick={() => addToBetSlip(match, outcome)}
                   >

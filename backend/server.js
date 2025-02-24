@@ -11,6 +11,40 @@ import { validateBets } from "./routes/validateBets.js"; // ✅ Import new funct
 
 dotenv.config();
 
+import fs from "fs";
+import path from "path";
+
+// ✅ Define the correct log file path
+const logFile = path.join(process.cwd(), "backend", "server.log");
+
+// ✅ Ensure the log file exists before writing
+if (!fs.existsSync(logFile)) {
+  fs.writeFileSync(logFile, ""); // Create an empty log file if missing
+}
+
+// ✅ Function to write logs
+function logMessage(message) {
+  const timestamp = new Date().toISOString();
+  const logEntry = `[${timestamp}] ${message}\n`;
+  try {
+    fs.appendFileSync(logFile, logEntry, "utf8");
+  } catch (error) {
+    console.error("❌ Error writing to server.log:", error);
+  }
+}
+
+// ✅ Override console.log and console.error
+console.log = (...args) => {
+  logMessage(args.join(" "));
+  process.stdout.write(args.join(" ") + "\n");
+};
+
+console.error = (...args) => {
+  logMessage("ERROR: " + args.join(" "));
+  process.stderr.write(args.join(" ") + "\n");
+};
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());

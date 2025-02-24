@@ -5,11 +5,14 @@ import dotenv from "dotenv";
 dotenv.config();
 const ODDS_API_KEY = process.env.ODDS_API_KEY;
 const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
+const MAX_API_RETRIES = 3;
 
 /**
  * ✅ Validate & Update Bets from API
- * - Handles API failures with retries
- * - Marks bets as 'validation_failed' if results cannot be found
+ * - Handles API failures gracefully
+ * - Retries API calls up to MAX_API_RETRIES times
+ * - Prevents quota overuse
+ * - Ensures each sport is fetched only once per cycle
  */
 async function validateBets() {
   try {
@@ -22,67 +25,60 @@ async function validateBets() {
       return { message: "No pending bets to validate." };
     }
 
-    // ✅ Group bets by sport_key to minimize API calls
-    const betsBySport = pendingBets.rows.reduce((acc, bet) => {
-      if (!acc[bet.sport_key]) acc[bet.sport_key] = [];
-      acc[bet.sport_key].push(bet);
-      return acc;
-    }, {});
-
     let updatedBets = [];
+    const fetchedSports = new Set(); // ✅ Track already fetched sports
 
-    for (let sportKey in betsBySport) {
-      try {
-        console.log(`🔍 Fetching results for sport: ${sportKey}`);
-        const response = await axios.get(
-          `${ODDS_API_URL}${sportKey}/scores/`,
-          { params: { apiKey: ODDS_API_KEY } }
-        );
+    for (let bet of pendingBets.rows) {
+      if (!bet.sport_key) continue;
+      if (fetchedSports.has(bet.sport_key)) {
+        console.log(`⚠️ Skipping duplicate API call for ${bet.sport_key}`);
+        continue;
+      }
 
-        const matchResults = response.data;
+      let retryCount = 0;
+      let success = false;
 
-        for (let bet of betsBySport[sportKey]) {
-          const match = matchResults.find((m) => m.id === bet.match_id);
+      while (retryCount < MAX_API_RETRIES && !success) {
+        try {
+          console.log(`🔄 Fetching results for sport: ${bet.sport_key}, Attempt: ${retryCount + 1}`);
+          const response = await axios.get(
+            `${ODDS_API_URL}${bet.sport_key}/scores/`,
+            { params: { apiKey: ODDS_API_KEY } }
+          );
 
-          if (!match || !match.completed) {
-            console.log(`⏳ Match ${bet.match_id} is not completed yet.`);
-            continue;
+          if (response.data.error_code === "OUT_OF_USAGE_CREDITS") {
+            console.error("❌ API Quota Exceeded. Stopping validation.");
+            return { message: "API quota exceeded. Try again later." };
           }
 
-          console.log(`✅ Match ${bet.match_id} is completed. Checking winner...`);
+          fetchedSports.add(bet.sport_key); // ✅ Mark this sport as fetched
+
+          const match = response.data.find((m) => m.id === bet.match_id);
+          if (!match || !match.completed) break;
+
+          console.log(`✅ Match ${bet.match_id} completed. Checking winner...`);
           const homeScore = match.scores?.find((s) => s.name === match.home_team)?.score;
           const awayScore = match.scores?.find((s) => s.name === match.away_team)?.score;
 
           let winningTeam = homeScore > awayScore ? match.home_team : match.away_team;
           let matchResult = winningTeam === bet.team_selected ? "win" : "loss";
-
-          console.log(`🎯 Bet ID ${bet.id} - Bet on: ${bet.team_selected} | Result: ${matchResult}`);
-
           let profitLoss = matchResult === "win" ? (bet.odds - 1) * 100 : -100;
 
-          // ✅ Update the bet in the database
           await pool.query(
             "UPDATE bets SET result = $1, profit_loss = $2 WHERE id = $3",
             [matchResult, profitLoss, bet.id]
           );
 
           updatedBets.push({ id: bet.id, result: matchResult, profitLoss });
-        }
-
-      } catch (apiError) {
-        console.error(`❌ API Error fetching results for ${sportKey}:`, apiError);
-
-        // ✅ Mark all bets under this sport as 'validation_failed'
-        for (let bet of betsBySport[sportKey]) {
-          await pool.query("UPDATE bets SET result = 'validation_failed' WHERE id = $1", [bet.id]);
-          console.log(`⚠️ Bet ID ${bet.id} marked as validation_failed.`);
+          success = true;
+        } catch (error) {
+          console.error(`❌ Error validating bet ${bet.id}, Attempt ${retryCount + 1}:`, error);
+          retryCount++;
         }
       }
     }
 
-    console.log("✅ Bets validated:", updatedBets);
     return { message: "Bets validated successfully!", updatedBets };
-
   } catch (error) {
     console.error("❌ Critical error validating bets:", error);
     return { message: "Server error during bet validation." };
@@ -90,3 +86,6 @@ async function validateBets() {
 }
 
 export { validateBets };
+
+
+
