@@ -1,7 +1,8 @@
 import React from 'react';
-import useNavigate from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { firebase_auth } from '../../firebase';
 
 
 const GoogleSignButton = ({ setUser, setError }) => {
@@ -10,14 +11,13 @@ const GoogleSignButton = ({ setUser, setError }) => {
     const handleGoogleAuth = async () =>{
         try{
             const provider = new GoogleAuthProvider();
-            const auth = getAuth();
 
-            const result = await signInWithPopup(auth, provider)
+            const result = await signInWithPopup(firebase_auth, provider)
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
 
             const response = await axios.post(
-                "http://localhost:5002/api/auth/google",
+                "http://localhost:5002/api/auth/googleAuth",
                 { token: token },
                 { withCredentials: true }
             );
@@ -25,11 +25,13 @@ const GoogleSignButton = ({ setUser, setError }) => {
             const backend_response = response.data;
 
             if (backend_response.success){
-                setUser(backend_response.user);
+                const user = backend_response.user;
+                setUser(user);
                 navigate("/profile")
 
             } else {
                 console.log("failed google login after backend response");
+                
 
             } 
 
@@ -37,6 +39,7 @@ const GoogleSignButton = ({ setUser, setError }) => {
 
         } catch (error){
             console.log("Google Auth Error", error);
+            setError(error);
         }
     }
     return (
@@ -44,4 +47,4 @@ const GoogleSignButton = ({ setUser, setError }) => {
     );
 }
 
-export default GoogleButton;
+export default GoogleSignButton;

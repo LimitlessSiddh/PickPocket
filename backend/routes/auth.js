@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser"; // ✅ Ensure this is installed
-const admin = require('firebase-admin');
 
 
 dotenv.config();
@@ -164,6 +163,7 @@ router.post("/googleAuth", async (req, res) => {
     const decoded_token = await admin.auth().verifyIdToken(token);
     const name = decoded_token.name;
     const email = decoded_token.email;
+    let user;
 
     // check if in db alr
     const existingUser = await pool.query(
@@ -171,25 +171,35 @@ router.post("/googleAuth", async (req, res) => {
       [email, name]
     );
 
-    if (existingUser) {
-      return res.status(200).send({
-        success: true,
-        message: "Authentication Successful",
-        userName: existingUser.name,
-        email: existingUser.email
-      });
+
+    if (existingUser.rows.length > 0 ) {
+      user = existingUser.rows[0];
     } else {
       const newUser = await pool.query(
         "INSERT INTO users (username, email) VALUES ($1, $2) RETURNING id, username, email",
-        [username, email]
+        [name, email]
       );
-      return res.status(200).send({
-        success: true,
-        message: "Authentication Successful",
-        userName: newUser.name,
-        email: newUser.email
-      });
+      user = newUser.rows[0]
     }
+
+    const jwtToken = jwt.sign(
+      { id: user.id, username: user.username, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 3600000,
+    });
+
+    return res.status(200).send({
+      success: true,
+      message: "Authentication Successful",
+      user: { id: user.id, username: user.username, email: user.email },
+    });
 
 
 
@@ -200,6 +210,8 @@ router.post("/googleAuth", async (req, res) => {
       message: "Authentication failed",
     });
   }
+
+
 
 
 
