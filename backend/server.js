@@ -15,7 +15,7 @@ import fs from "fs";
 import path from "path";
 
 // ✅ Define the correct log file path
-const logFile = path.join(process.cwd(), "backend", "server.log");
+const logFile = path.join(process.cwd(), "server.log");
 
 // ✅ Ensure the log file exists before writing
 if (!fs.existsSync(logFile)) {
