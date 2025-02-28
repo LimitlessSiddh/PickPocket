@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
 
     // ✅ Check if email or username already exists
     const existingUser = await pool.query(
-      "SELECT username, email FROM users WHERE email = $1 OR username = $2",
+      "SELECT username, email FROM users WHERE email = $1 AND username = $2 LIMIT 1",
       [email, username]
     );
 
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
     console.log("🔍 Incoming Login Request:", email);
 
     // ✅ Check if user exists
-    const userQuery = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const userQuery = await pool.query("SELECT * FROM users WHERE email = $1 LIMIT 1", [email]);
     if (userQuery.rows.length === 0) {
       console.log("❌ No user found with this email");
       return res.status(401).json({ message: "Invalid email or password" });
