@@ -155,4 +155,11 @@ router.get("/profile", authenticateUser, async (req, res) => {
   }
 });
 
+router.post("/googleAuth", async (req, res) => {
+
+  // handle getting token from firebase, extracting info, check DB -> create or login
+
+
+});
+
 export default router;
