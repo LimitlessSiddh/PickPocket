@@ -1,6 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const googleID = "googleID"; // need to initialize this key
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(
+    <GoogleOAuthProvider clientId={googleID}>
+         <App />
+    </GoogleOAuthProvider>
+);

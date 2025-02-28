@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-     
+
       <h2 className="home-title">Welcome to PickPocket</h2>
       <p className="home-subtitle">Track your bets, prove your skills.</p>
 
@@ -29,4 +29,3 @@ export default Home;
 
 
 
-  

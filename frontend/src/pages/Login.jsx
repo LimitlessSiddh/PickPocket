@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css"; // ✅ Ensure this CSS file exists
 import axios from "axios";
+import GoogleButton from "../components/GoogleButton";
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState("");
@@ -85,8 +86,9 @@ const Login = ({ setUser }) => {
         </form>
 
         <p className="login-footer">
-          Don't have an account? <a href="/register">Register here</a>
+        <Link to={"/login"}>Don't have an account?</Link>
         </p>
+        <GoogleButton/>
       </div>
     </div>
   );
