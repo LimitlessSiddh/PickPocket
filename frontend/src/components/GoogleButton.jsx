@@ -1,22 +1,39 @@
 import React from 'react';
 import useNavigate from 'react-router-dom';
-import { auth, googleProvider } from "firebase";
-import Navbar from './Navbar';
+import axios from 'axios';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 
-// need to make the account and add the key and wrap 
 
-const GoogleButton = () => {
+const GoogleSignButton = ({ setUser, setError }) => {
     const navigate = useNavigate();
+
     const handleGoogleAuth = async () =>{
         try{
-            const response = await auth.signInWithPopup(googleProvider);
-            console.log("Google Auth Response", response);
-            const user = response.user;
-            const token = await user.getIdToken();
+            const provider = new GoogleAuthProvider();
+            const auth = getAuth();
 
-            // send token to backend to check if worked
+            const result = await signInWithPopup(auth, provider)
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
 
-            navigate('/profile');
+            const response = await axios.post(
+                "http://localhost:5002/api/auth/google",
+                { token: token },
+                { withCredentials: true }
+            );
+
+            const backend_response = response.data;
+
+            if (backend_response.success){
+                setUser(backend_response.user);
+                navigate("/profile")
+
+            } else {
+                console.log("failed google login after backend response");
+
+            } 
+
+
 
         } catch (error){
             console.log("Google Auth Error", error);

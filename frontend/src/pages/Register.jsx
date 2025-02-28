@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Register.css"; // ✅ Ensure this CSS file is updated
 import axios from "axios";
-import GoogleButton from "../components/GoogleButton";
+import GoogleSignButton from "../components/GoogleButton";
 
 
 const Register = ({ setUser }) => {
@@ -116,7 +116,7 @@ const Register = ({ setUser }) => {
         <p className="register-footer">
           <Link to={"/login"}>Already have an account?</Link>
         </p>
-        <GoogleButton/>
+        <GoogleSignButton setUser = { setUser }/>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css"; // ✅ Ensure this CSS file exists
 import axios from "axios";
-import GoogleButton from "../components/GoogleButton";
+import GoogleSignButton from "../components/GoogleButton";
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState("");
@@ -88,7 +88,7 @@ const Login = ({ setUser }) => {
         <p className="login-footer">
         <Link to={"/login"}>Don't have an account?</Link>
         </p>
-        <GoogleButton/>
+        <GoogleSignButton setUser = { setUser } setError = { setError }/>
       </div>
     </div>
   );

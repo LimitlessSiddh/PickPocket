@@ -1,19 +1,23 @@
-import firebase from 'firebase/app';
-import "firebase/auth";
+import { initializeApp} from 'firebase/app';
+import { getAnalytics } from "firevase/analytics";
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+
+
 
 
 // create firebase project and add all info here
-const firbaseConfig = {
-    apiKey: 1,
-    authDomain: 2,
-    projectId: 3,
-    storageBucket: 4,
-    messagingSenderId: 5,
-    appId: 6,
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID, 
+  };
 
-};
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
-firebase.initializeApp(firbaseConfig);
-
-export const firebase_auth = firebase.auth();
-export const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const firebase_auth = getAuth();
+export const googleProvider = new GoogleAuthProvider();

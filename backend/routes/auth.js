@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser"; // ✅ Ensure this is installed
+const admin = require('firebase-admin');
+
 
 dotenv.config();
 
@@ -111,7 +113,7 @@ router.post("/login", async (req, res) => {
 // ✅ Logout User
 router.post("/logout", (req, res) => {
   console.log("🚪 Logging out user...");
-  
+
   res.clearCookie("token"); // ✅ Remove session token
   res.status(200).json({ message: "Logged out successfully" });
 });
@@ -156,8 +158,49 @@ router.get("/profile", authenticateUser, async (req, res) => {
 });
 
 router.post("/googleAuth", async (req, res) => {
+  const token = req.body.token;
+  try {
 
-  // handle getting token from firebase, extracting info, check DB -> create or login
+    const decoded_token = await admin.auth().verifyIdToken(token);
+    const name = decoded_token.name;
+    const email = decoded_token.email;
+
+    // check if in db alr
+    const existingUser = await pool.query(
+      "SELECT username, email FROM users WHERE email = $1 AND username = $2 LIMIT 1",
+      [email, name]
+    );
+
+    if (existingUser) {
+      return res.status(200).send({
+        success: true,
+        message: "Authentication Successful",
+        userName: existingUser.name,
+        email: existingUser.email
+      });
+    } else {
+      const newUser = await pool.query(
+        "INSERT INTO users (username, email) VALUES ($1, $2) RETURNING id, username, email",
+        [username, email]
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Authentication Successful",
+        userName: newUser.name,
+        email: newUser.email
+      });
+    }
+
+
+
+  } catch (error) {
+    console.log("error in backend during google auth", error);
+    return res.status(500).send({
+      success: false,
+      message: "Authentication failed",
+    });
+  }
+
 
 
 });
