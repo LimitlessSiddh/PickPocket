@@ -27,3 +27,5 @@ dist-ssr
 .env
 eslint.config.js
 /node_modules
+
+pickpocket-67458-firebase-adminsdk-fbsvc-71dcb2a00b.json

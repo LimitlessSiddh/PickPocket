@@ -1,3 +1,16 @@
-import admin from "firebase-admin";
+import dotenv from "dotenv";
+import admin from 'firebase-admin'
 
-// need to initialize the admin then google login will start to work
+
+dotenv.config();
+
+const serviceAccount = process.env.VITE_FIREBASE_PRIVATE_KEY;
+
+
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
+
+
+export default admin;

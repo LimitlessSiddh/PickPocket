@@ -1,9 +1,10 @@
 import express from "express";
-import pool from "../config/db.js"; // ✅ PostgreSQL Connection
+import pool from "../config/db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser"; // ✅ Ensure this is installed
+import cookieParser from "cookie-parser"; 
+import admin from "../config/firebaseAdmin.js";
 
 
 dotenv.config();
@@ -197,7 +198,7 @@ router.post("/googleAuth", async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Authentication Successful",
+      message: "Google Authentication Successful",
       user: { id: user.id, username: user.username, email: user.email },
     });
 
@@ -210,10 +211,6 @@ router.post("/googleAuth", async (req, res) => {
       message: "Authentication failed",
     });
   }
-
-
-
-
 
 });
 

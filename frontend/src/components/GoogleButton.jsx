@@ -1,7 +1,7 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { firebase_auth } from '../../firebase';
 
 
@@ -13,12 +13,12 @@ const GoogleSignButton = ({ setUser, setError }) => {
             const provider = new GoogleAuthProvider();
 
             const result = await signInWithPopup(firebase_auth, provider)
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
+
+            const idToken = await result.user.getIdToken();
 
             const response = await axios.post(
                 "http://localhost:5002/api/auth/googleAuth",
-                { token: token },
+                { token: idToken },
                 { withCredentials: true }
             );
 
