@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/Register.css"; // ✅ Ensure this CSS file is updated
 import axios from "axios";
+import GoogleSignButton from "../components/GoogleButton";
+
 
 const Register = ({ setUser }) => {
   const [username, setUsername] = useState("");
@@ -112,8 +114,9 @@ const Register = ({ setUser }) => {
         </form>
 
         <p className="register-footer">
-          Already have an account? <a href="/login">Log in</a>
+          <Link to={"/login"}>Already have an account?</Link>
         </p>
+        <GoogleSignButton setUser = { setUser }/>
       </div>
     </div>
   );

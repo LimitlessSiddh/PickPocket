@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link} from "react-router-dom";
 import "../styles/Login.css"; // ✅ Ensure this CSS file exists
 import axios from "axios";
+import GoogleSignButton from "../components/GoogleButton";
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState("");
@@ -85,8 +86,9 @@ const Login = ({ setUser }) => {
         </form>
 
         <p className="login-footer">
-          Don't have an account? <a href="/register">Register here</a>
+        <Link to={"/register"}>Don't have an account?</Link>
         </p>
+        <GoogleSignButton setUser = { setUser } setError = { setError }/>
       </div>
     </div>
   );

@@ -7,11 +7,11 @@ const { Pool } = pkg; // ✅ Correct way to import 'pg'
 
 // ✅ Create PostgreSQL Pool
 const pool = new Pool({
-  user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "127.0.0.1",
-  database: process.env.DB_NAME || "pickpocketdb",  // Ensure this is correct
-  password: process.env.DB_PASSWORD || "DoublePS2025",
-  port: process.env.DB_PORT || 5432,
+  user: process.env.VITE_DB_USER ,
+  host: process.env.VITE_DB_HOST,
+  database: process.env.VITE_DB_NAME,  // Ensure this is correct
+  password: process.env.VITE_DB_PASSWORD,
+  port: process.env.VITE_DB_PORT,
   
   ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
 });

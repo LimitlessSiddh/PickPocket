@@ -15,7 +15,7 @@ import fs from "fs";
 import path from "path";
 
 // ✅ Define the correct log file path
-const logFile = path.join(process.cwd(), "backend", "server.log");
+const logFile = path.join(process.cwd(), "server.log");
 
 // ✅ Ensure the log file exists before writing
 if (!fs.existsSync(logFile)) {
@@ -46,7 +46,13 @@ console.error = (...args) => {
 
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: "http://localhost:5174", 
+  credentials: true, 
+  methods: "GET,POST,PUT,DELETE",
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5002;
