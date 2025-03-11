@@ -1,15 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = ({ user, setUser }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Handle logout logic
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
     window.location.href = "/login";
   };
+
+  // Close menu when resizing to larger screens (md or above)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMenuOpen(false); // Close menu when screen is md or larger
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 w-full bg-[#0a192f] text-whitesmoke z-10 shadow-lg">
@@ -41,7 +58,7 @@ const Navbar = ({ user, setUser }) => {
         </div>
 
         <nav
-          className={`md:flex items-center gap-6 ${menuOpen ? "block absolute bg-[#0a192f] w-full left-0 top-full py-4 transition-all duration-1000 ease-in-out" : "hidden"} md:block`}
+          className={`md:flex items-center gap-6 ${menuOpen ? "block absolute bg-[#0a192f] w-full left-0 top-full py-4 transition-all duration-1000 ease-in-out" : "hidden md:block"}`}
         >
           {user ? (
             <>
