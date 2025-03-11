@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import SportLogos from "../components/SportLogos";
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden w-1/2 mx-auto">
+    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden w-full mx-auto ">
       
       <div className="w-full flex justify-center items-center">
         <h2 className="text-3xl font-semibold text-blue-950">Welcome to PickPocket</h2>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center w-full mt-5 px-6 md:px-12 py-10">
+      <div className="flex flex-col md:flex-row justify-between items-center w-1/2 mt-5 px-6 md:px-12 py-10">
         
         <h4 className="text-lg md:text-xl text-blue-950 mb-4 md:mb-0">
           Track your bets, prove your skills.
@@ -26,6 +27,8 @@ const Home = () => {
         </button>
 
       </div>
+
+      <SportLogos />
 
     </div>
   );
