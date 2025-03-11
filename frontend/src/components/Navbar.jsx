@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import "../styles/Navbar.css";
+import "../styles/Nav.css";
 
-const Navbar = ({ user, setUser, theme, setTheme }) => {
+const Navbar = ({ user, setUser }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -9,40 +9,25 @@ const Navbar = ({ user, setUser, theme, setTheme }) => {
     window.location.href = "/login";
   };
 
-  // Toggle Theme
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    document.body.setAttribute("data-theme", newTheme);
-  };
-
   return (
-    <nav className="navbar">
+    <header className="navbar">
       <div className="navbar-logo">
-        <Link to="/">PickPocket</Link>
+        <Link to="/"><h1>PickPocket</h1></Link>
       </div>
-      <div className="navbar-links">
-        <Link to="/leaderboard">Leaderboard</Link>
-        <Link to="/betting">Betting</Link>
-      </div>
-      <div className="navbar-auth">
+      <nav className="navbar-right">
         {user ? (
           <>
-            <Link to="/profile" className="profile-btn">👤 {user.username}</Link>
-            <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
+            <Link to="/profile" className="profile-btn"> {user.username}</Link>
+            <button onClick={handleLogout} className="navbar-links">Logout</button>
           </>
         ) : (
           <>
-            <Link to="/login" className="login-btn">🔑 Login</Link>
-            <Link to="/register" className="register-btn">📝 Register</Link>
+            <Link to="/login" className="navbar-links"><h3>Login</h3></Link>
           </>
         )}
-        {/* Theme Toggle Button */}
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {theme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode"}
-        </button>
-      </div>
-    </nav>
+        <Link to="/leaderboard"><h3>Leaderboard</h3></Link>
+      </nav>
+    </header>
   );
 };
 

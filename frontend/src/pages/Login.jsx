@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate , Link} from "react-router-dom";
-import "../styles/Login.css"; // ✅ Ensure this CSS file exists
 import axios from "axios";
 import GoogleSignButton from "../components/GoogleButton";
 

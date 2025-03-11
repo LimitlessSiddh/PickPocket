@@ -1,4 +1,3 @@
-import "../styles/SelectBets.css";
 
 const SelectBets = () => {
   return (

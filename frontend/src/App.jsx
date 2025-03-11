@@ -13,21 +13,15 @@ import "./index.css";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [bets, setBets] = useState([]);
   const [returnPercentage, setReturnPercentage] = useState(0);
   const [showBetSlip, setShowBetSlip] = useState(false);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    console.log("🟢 Stored Token:", localStorage.getItem("token"));
+    console.log("Stored Token:", localStorage.getItem("token"));
   
     if (!localStorage.getItem("token")) {
-      console.log("🔴 No token found, user is NULL.");
+      console.log("No token found, user is NULL.");
       return;
     }
 
@@ -40,10 +34,9 @@ function App() {
         console.log("✅ User data fetched:", response.data);
         setUser(response.data);
 
-        // ✅ Fetch user's bet history to sync frontend
         fetchUserBets();
       } catch (error) {
-        console.error("🔴 Profile Fetch Error:", error);
+        console.error("Profile Fetch Error:", error);
         localStorage.removeItem("token");
         setUser(null);
       }
@@ -60,20 +53,20 @@ function App() {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      console.log("✅ User Bets Fetched:", response.data);
+      console.log("User Bets Fetched:", response.data);
       setBets(response.data);
     } catch (error) {
-      console.error("❌ Error fetching bets:", error);
+      console.error("Error fetching bets:", error);
     }
   };
 
   useEffect(() => {
-    console.log("🟢 Current User in State:", user);
+    console.log("Current User in State:", user);
   }, [user]);
 
   return (
     <Router>
-      <Navbar user={user} setUser={setUser} theme={theme} setTheme={setTheme} />
+      <Navbar user={user} setUser={setUser}/>
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />

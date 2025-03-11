@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/BettingPage.css";
 import BetSlip from "../components/BetSlip";
 
 const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
