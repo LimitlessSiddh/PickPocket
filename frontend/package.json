@@ -13,10 +13,10 @@
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
     "@tailwindcss/vite": "^4.0.12",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.7.9",
     "firebase": "^11.4.0",
-    "postcss": "^8.5.1",
+    "postcss": "^8.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-fast-marquee": "^1.6.5",
