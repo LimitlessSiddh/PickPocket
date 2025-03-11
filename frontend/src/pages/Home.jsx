@@ -5,7 +5,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden w-full mx-auto ">
+    <div className="flex bg-white flex-col items-center justify-center min-h-screen overflow-hidden w-full mx-auto ">
       
       <div className="w-full flex justify-center items-center">
         <h2 className="text-3xl font-semibold text-blue-950">Welcome to PickPocket</h2>
