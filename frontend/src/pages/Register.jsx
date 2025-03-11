@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import GoogleSignButton from "../components/GoogleButton";
 
-
 const Register = ({ setUser }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -17,7 +16,6 @@ const Register = ({ setUser }) => {
     setError("");
     setLoading(true);
 
-    // ✅ Basic Input Validation
     if (!username || !email || !password) {
       setError("All fields are required!");
       setLoading(false);
@@ -25,32 +23,29 @@ const Register = ({ setUser }) => {
     }
 
     try {
-      console.log("🔍 Sending registration request...");
+      console.log("Sending registration request...");
       const response = await axios.post("http://localhost:5002/api/auth/register", {
         username,
         email,
         password,
       });
 
-      console.log("✅ Server response:", response.data);
+      console.log("Server response:", response.data);
 
       if (response.status === 201) {
         const { token, user } = response.data;
 
-        // ✅ Store token and user info
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
 
-        // ✅ Redirect to profile after successful sign-up
         navigate("/profile");
       } else {
         setError("Registration failed. Please try again.");
       }
     } catch (err) {
-      console.error("❌ Registration error:", err);
+      console.error("Registration error:", err);
 
-      // ✅ Handle API Response Errors
       if (err.response) {
         if (err.response.status === 400) {
           setError("Email or username already in use.");
@@ -66,15 +61,16 @@ const Register = ({ setUser }) => {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <h2 className="register-title">Join PickPocket</h2>
-        <p className="register-subtitle">Create an account to start tracking your bets.</p>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-gray-900 text-white p-6 rounded-lg shadow-lg">
+        
+        <h2 className="text-2xl font-bold text-center">Join PickPocket</h2>
+        <p className="text-gray-400 text-center mb-4">Create an account to start tracking your bets.</p>
 
-        {error && <p className="register-error">{error}</p>}
+        {error && <p className="text-red-500 text-center mb-3">{error}</p>}
 
-        <form onSubmit={handleRegister}>
-          <div className="input-group">
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div>
             <input
               type="text"
               placeholder="Username"
@@ -82,10 +78,11 @@ const Register = ({ setUser }) => {
               onChange={(e) => setUsername(e.target.value)}
               required
               disabled={loading}
+              className="w-full px-4 py-3 bg-gray-800 text-white rounded-md border border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-400 outline-none disabled:opacity-50"
             />
           </div>
 
-          <div className="input-group">
+          <div>
             <input
               type="email"
               placeholder="Email Address"
@@ -93,10 +90,11 @@ const Register = ({ setUser }) => {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              className="w-full px-4 py-3 bg-gray-800 text-white rounded-md border border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-400 outline-none disabled:opacity-50"
             />
           </div>
 
-          <div className="input-group">
+          <div>
             <input
               type="password"
               placeholder="Password"
@@ -104,24 +102,32 @@ const Register = ({ setUser }) => {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
+              className="w-full px-4 py-3 bg-gray-800 text-white rounded-md border border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-400 outline-none disabled:opacity-50"
             />
           </div>
 
-          <button type="submit" className="register-btn" disabled={loading}>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 transition py-3 text-lg font-semibold rounded-md disabled:opacity-50"
+          >
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
-        <p className="register-footer">
-          <Link to={"/login"}>Already have an account?</Link>
+        <p className="text-center text-gray-400 mt-3">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-400 hover:underline">
+            Log in
+          </Link>
         </p>
-        <GoogleSignButton setUser = { setUser }/>
+
+        <div className="flex justify-center items-center mt-4">
+          <GoogleSignButton setUser={setUser} setError={setError} />
+        </div>
       </div>
     </div>
   );
 };
 
 export default Register;
-
-
-
