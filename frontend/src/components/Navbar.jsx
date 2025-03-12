@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../styles/Navbar.css";
 
-const Navbar = ({ user, setUser, theme, setTheme }) => {
+const Navbar = ({ user, setUser }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -9,53 +11,88 @@ const Navbar = ({ user, setUser, theme, setTheme }) => {
     window.location.href = "/login";
   };
 
-  // Toggle Theme
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    document.body.setAttribute("data-theme", newTheme);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMenuOpen(false); 
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <Link to="/">PickPocket</Link>
+    <header className="fixed top-0 left-0 w-full bg-[#0a192f] text-whitesmoke z-10 shadow-lg">
+      <div className="container mx-auto flex justify-between items-center py-4">
+        <div className="text-2xl font-bold text-white hover: transition-transform duration-500 ease-in-out transform hover:scale-[1.1]">
+          <Link to="/">PickPocket</Link>
+        </div>
+
+        <div className="flex items-center md:hidden">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 hover: transition-transform duration-500 ease-in-out transform hover:scale-[1.2]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <nav
+          className={`md:flex items-center gap-6 ${menuOpen ? "block absolute bg-[#0a192f] w-full left-0 top-full py-4 transition-all duration-1000 ease-in-out" : "hidden md:block"}`}
+        >
+          {user ? (
+            <>
+              <Link
+                onClick={() => setMenuOpen(false)}
+                to="/profile"
+                className="text-white hover:text-gray-300 transition block px-4 py-2"
+              >
+                {user.username}
+              </Link>
+              <button
+                onClick={() => {handleLogout; setMenuOpen(false)}}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition block"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              onClick={() => setMenuOpen(false)}
+              to="/login"
+              className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
+            >
+              Login
+            </Link>
+          )}
+          <Link
+            onClick={() => setMenuOpen(false)}
+            to="/leaderboard"
+            className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
+          >
+            Leaderboard
+          </Link>
+        </nav>
       </div>
-      <div className="navbar-links">
-        <Link to="/leaderboard">Leaderboard</Link>
-        <Link to="/betting">Betting</Link>
-      </div>
-      <div className="navbar-auth">
-        {user ? (
-          <>
-            <Link to="/profile" className="profile-btn">👤 {user.username}</Link>
-            <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="login-btn">🔑 Login</Link>
-            <Link to="/register" className="register-btn">📝 Register</Link>
-          </>
-        )}
-        {/* Theme Toggle Button */}
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {theme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode"}
-        </button>
-      </div>
-    </nav>
+    </header>
   );
 };
 
 export default Navbar;
-
-
-
-
-
-
-
-
-
-
-
-

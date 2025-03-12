@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { firebase_auth } from '../../firebase';
+import google_img from "../assets/google_logo.png";
 
 
 const GoogleSignButton = ({ setUser, setError }) => {
@@ -43,7 +44,14 @@ const GoogleSignButton = ({ setUser, setError }) => {
         }
     }
     return (
-        <button onClick={handleGoogleAuth}>Sign in with Google</button>
+        <button onClick={handleGoogleAuth}
+        className="flex items-center justify-center p-3">
+            <img
+            className='w-auto h-8 hover: transition-transform duration-500 ease-in-out transform hover:scale-[1.2]'
+            src={google_img}
+            alt="Google sign in"
+             />
+        </button>
     );
 }
 

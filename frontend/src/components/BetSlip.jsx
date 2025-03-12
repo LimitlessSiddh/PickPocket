@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/BetSlip.css";
 
 const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
   console.log("🟢 User received in BetSlip:", user);

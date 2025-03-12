@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import "../styles/BetButton.css";
 
 const BetButton = () => {
   const navigate = useNavigate();
