@@ -48,7 +48,7 @@ const Login = ({ setUser }) => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-gray-900 text-white p-6 rounded-lg shadow-lg">
+      <div className="w-full max-w-md bg-[#0a192f] text-white p-6 rounded-lg shadow-lg">
         
         <h2 className="text-2xl font-bold text-center">Welcome Back</h2>
         <p className="text-gray-400 text-center mb-4">Log in to track your bets and compete.</p>
