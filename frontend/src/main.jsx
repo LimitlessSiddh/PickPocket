@@ -8,7 +8,5 @@ const googleID = "googleID"; // need to initialize this key
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <GoogleOAuthProvider clientId={googleID}>
          <App />
-    </GoogleOAuthProvider>
 );

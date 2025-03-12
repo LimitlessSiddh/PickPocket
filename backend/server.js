@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./config/db.js";
 import authRoutes from "./routes/auth.js";
-import betRoutes from "./routes/bets.js"; // ✅ Keep this for placing/retrieving bets
+import betRoutes from "./routes/bets.js"; 
 import userRoutes from "./routes/user.js";
 import leaderboardRoutes from "./routes/leaderboard.js";
 import cron from "node-cron";
-import { validateBets } from "./routes/validateBets.js"; // ✅ Import new function
+import { validateBets } from "./routes/validateBets.js"; 
 
 dotenv.config();
 
@@ -48,7 +48,7 @@ console.error = (...args) => {
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: "http://localhost:5174", 
   credentials: true, 
   methods: "GET,POST,PUT,DELETE",
 }));
