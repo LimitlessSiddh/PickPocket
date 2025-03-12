@@ -2,19 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
-  console.log("🟢 User received in BetSlip:", user);
   const [betType, setBetType] = useState("single");
   const [totalMultiplier, setTotalMultiplier] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-
-  // ✅ Retrieve token from localStorage
   const token = localStorage.getItem("token");
-
-  // ✅ Debugging: Check if `user` and `token` exist
-  console.log("🟢 User in BetSlip:", user);
-  console.log("🟢 Token in localStorage:", token);
- 
 
   useEffect(() => {
     if (betType === "parlay" && bets.length > 1) {
@@ -30,139 +22,80 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
     updatedBets.splice(index, 1);
     setBets(updatedBets);
 
+    // Hide the BetSlip when no bets remain
     if (updatedBets.length === 0) {
       setShowBetSlip(false);
     }
   };
 
   const handleSubmitBets = async () => {
-    console.log("🟢 Submitting Bet - Checking user and token...");
-  
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("🔴 No token found in local storage.");
-      setError("You must be logged in to place a bet.");
+    if (!token || !user || bets.length === 0) {
+      setError("Please log in and add bets before submitting.");
       return;
     }
-  
-    if (!user) {
-      console.error("🔴 User state is NULL.");
-      setError("You must be logged in to place a bet.");
-      return;
-    }
-  
-    if (bets.length === 0) {
-      console.error("🔴 No bets in slip.");
-      setError("Your bet slip is empty.");
-      return;
-    }
-  
+
     setIsSubmitting(true);
     setError(null);
-  
+
     try {
-      // Fetch latest match data to get correct match_id
-      const sportKey = bets[0].sport_key; // Assume all bets are in the same sport
-      const matchResponse = await axios.get(
-        `https://api.the-odds-api.com/v4/sports/${sportKey}/scores/`,
-        { params: { apiKey: "5547690b7fe24b9ec6904dee468982d0" } }
-      );
-  
-      const matchData = matchResponse.data;
-      console.log("🟢 API Match Data:", matchData);
-  
-      const formattedBets = bets.map((bet) => {
-        const match = matchData.find(
-          (m) => m.home_team === bet.team_selected || m.away_team === bet.team_selected
-        );
-  
-        if (!match) {
-          console.error(`❌ No match found for ${bet.team_selected}`);
-          setError(`No valid match found for ${bet.team_selected}`);
-          return null;
-        }
-  
-        return {
-          match_id: match.id,
-          team_selected: bet.team_selected,
-          odds: bet.odds,
-          sport_key: sportKey,
-        };
-      }).filter(Boolean);
-  
-      if (formattedBets.length === 0) {
-        setError("No valid bets found. Please try again.");
-        return;
-      }
-  
-      console.log("🟢 Sending API request with:", { betType, bets: formattedBets });
-  
       const response = await axios.post(
         "http://localhost:5002/api/bets",
-        { betType, bets: formattedBets },
+        { betType, bets },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
-  
-      console.log("✅ Bet submitted successfully:", response.data);
+
       setBets([]);
       setShowBetSlip(false);
     } catch (err) {
-      console.error("❌ Bet submission error:", err.response?.data || err);
       setError("Failed to submit bet. Try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // 🚀 Only render BetSlip when bets are available
+  if (bets.length === 0) return null;
+
   return (
-    <div className={`betslip-container ${bets.length > 0 ? "show" : "hide"}`}>
-      <div className="betslip-header">
-        <h2>📝 Bet Slip</h2>
-        <button className="close-betslip" onClick={() => setShowBetSlip(false)}>❌</button>
+    <div className="fixed right-4 top-20 w-80 bg-white shadow-lg border border-gray-300 p-5 rounded-lg">
+      <div className="flex justify-between items-center border-b pb-3 mb-3">
+        <h2 className="text-xl font-semibold text-blue-950">📝 Bet Slip</h2>
+        <button className="text-red-500 hover:text-red-700" onClick={() => setShowBetSlip(false)}>❌</button>
       </div>
 
-      <div className="bet-type">
-        <label>
-          <input
-            type="radio"
-            value="single"
-            checked={betType === "single"}
-            onChange={() => setBetType("single")}
-          />
+      <div className="flex gap-3 text-sm text-blue-950 mb-4">
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input type="radio" value="single" checked={betType === "single"} onChange={() => setBetType("single")} />
           Single Bets
         </label>
-        <label>
-          <input
-            type="radio"
-            value="parlay"
-            checked={betType === "parlay"}
-            onChange={() => setBetType("parlay")}
-            disabled={bets.length < 2}
-          />
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input type="radio" value="parlay" checked={betType === "parlay"} onChange={() => setBetType("parlay")} disabled={bets.length < 2} />
           Parlay
         </label>
       </div>
 
-      {bets.length === 0 ? (
-        <p className="empty-betslip">No bets added yet.</p>
-      ) : (
-        <ul className="bet-list">
-          {bets.map((bet, index) => (
-            <li key={index} className="bet-item">
-              <span>{bet.teams} @ {bet.odds}</span>
-              <button className="remove-bet" onClick={() => handleRemoveBet(index)}>❌</button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="space-y-3">
+        {bets.map((bet, index) => (
+          <li key={index} className="flex justify-between items-center bg-[#202334] text-slate-300 p-3 rounded-md shadow">
+            <span>{bet.teams} @ {bet.odds}</span>
+            <button className="text-red-400 hover:text-red-600" onClick={() => handleRemoveBet(index)}>❌</button>
+          </li>
+        ))}
+      </ul>
 
       {betType === "parlay" && bets.length > 1 && (
-        <p className="parlay-multiplier">🔥 Parlay Multiplier: {totalMultiplier}x</p>
+        <p className="text-green-500 font-semibold mt-3">🔥 Parlay Multiplier: {totalMultiplier}x</p>
       )}
 
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
 
-      <button onClick={handleSubmitBets} disabled={isSubmitting || bets.length === 0}>
+      <button 
+        onClick={handleSubmitBets} 
+        disabled={isSubmitting || bets.length === 0} 
+        className="w-full mt-4 py-2 bg-white text-[#202334] border-2 border-gray-300 font-semibold rounded-md transition 
+                   transform hover:scale-105 hover:bg-[#253a4a] hover:text-white hover:shadow-lg 
+                   active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500"
+      >
         {isSubmitting ? "Submitting..." : "✅ Submit Bet"}
       </button>
     </div>
