@@ -9,8 +9,8 @@ const logos = [nba, nfl, pga, nhl, ufc];
 
 const SportLogos = () => {
     return (
-        <section className='w-[85%] flex justify-between items-center mt-12'>
-            <Marquee speed={120} gradient={true}>
+        <section className=' w-[85%] flex justify-between items-center mt-12'>
+            <Marquee speed={120} gradient={true} >
 
                     {
                         logos.map((logo, index) => (

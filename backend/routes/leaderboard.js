@@ -3,10 +3,6 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-/**
- * 🏆 Leaderboard Rankings
- * - Ranks users based on ROI, Win %, Streaks, or Activity
- */
 router.get("/", async (req, res) => {
   try {
     const leaderboardQuery = await pool.query(`
@@ -25,12 +21,12 @@ router.get("/", async (req, res) => {
       FROM users u
       LEFT JOIN bets b ON u.id = b.user_id
       GROUP BY u.id, u.username
-      ORDER BY roi DESC NULLS LAST, total_bets DESC NULLS LAST
+      ORDER BY roi DESC NULLS LAST, total_bets DESC NULLS LAST;
     `);
 
     res.json(leaderboardQuery.rows);
   } catch (error) {
-    console.error("❌ Leaderboard Fetch Error:", error);
+    console.error("Leaderboard Fetch Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });

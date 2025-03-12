@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 const Navbar = ({ user, setUser }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Handle logout logic
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -12,17 +11,15 @@ const Navbar = ({ user, setUser }) => {
     window.location.href = "/login";
   };
 
-  // Close menu when resizing to larger screens (md or above)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        setMenuOpen(false); // Close menu when screen is md or larger
+        setMenuOpen(false); 
       }
     };
 
     window.addEventListener("resize", handleResize);
 
-    // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -63,13 +60,14 @@ const Navbar = ({ user, setUser }) => {
           {user ? (
             <>
               <Link
+                onClick={() => setMenuOpen(false)}
                 to="/profile"
                 className="text-white hover:text-gray-300 transition block px-4 py-2"
               >
                 {user.username}
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={() => {handleLogout; setMenuOpen(false)}}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition block"
               >
                 Logout
@@ -77,6 +75,7 @@ const Navbar = ({ user, setUser }) => {
             </>
           ) : (
             <Link
+              onClick={() => setMenuOpen(false)}
               to="/login"
               className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
             >
@@ -84,6 +83,7 @@ const Navbar = ({ user, setUser }) => {
             </Link>
           )}
           <Link
+            onClick={() => setMenuOpen(false)}
             to="/leaderboard"
             className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
           >
