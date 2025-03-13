@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (req: AuthReq, res: AuthRes) => {
   try {
     const leaderboardQuery = await pool.query(`
       SELECT 

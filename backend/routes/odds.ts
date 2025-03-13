@@ -8,8 +8,7 @@ const router = express.Router();
 const ODDS_API_KEY = process.env.ODDS_API_KEY;
 const BASE_URL = "https://api.the-odds-api.com/v4/sports";
 
-// ✅ Fetch live odds for a specific sport
-router.get("/:sport", async (req, res) => {
+router.get("/:sport", async (req: AuthReq, res: AuthRes) => {
   try {
     const sport = req.params.sport; // Example: "soccer_epl"
     const region = "us"; // Change based on where most users are
@@ -27,7 +26,7 @@ router.get("/:sport", async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error("❌ Error fetching odds:", error);
+    console.error("Error fetching odds:", error);
     res.status(500).json({ message: "Failed to fetch odds." });
   }
 });

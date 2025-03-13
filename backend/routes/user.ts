@@ -6,12 +6,10 @@ import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
-// ✅ Upload Profile Picture Setup
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ Get User Profile
-router.get("/profile", authMiddleware, async (req, res) => {
+router.get("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const userId = req.user.id;
     const userQuery = await pool.query(
@@ -25,13 +23,12 @@ router.get("/profile", authMiddleware, async (req, res) => {
 
     res.status(200).json(userQuery.rows[0]);
   } catch (error) {
-    console.error("❌ Profile Fetch Error:", error);
+    console.error("Profile Fetch Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });
 
-// ✅ Update User Profile (Username & Email)
-router.put("/profile", authMiddleware, async (req, res) => {
+router.put("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const { username, email } = req.body;
     const userId = req.user.id;
@@ -43,13 +40,12 @@ router.put("/profile", authMiddleware, async (req, res) => {
 
     res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
-    console.error("❌ Profile Update Error:", error);
+    console.error("Profile Update Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });
 
-// ✅ Update Password
-router.put("/profile/password", authMiddleware, async (req, res) => {
+router.put("/profile/password", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
@@ -70,13 +66,12 @@ router.put("/profile/password", authMiddleware, async (req, res) => {
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("❌ Password Update Error:", error);
+    console.error("Password Update Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });
 
-// ✅ Upload Profile Picture
-router.put("/profile/avatar", authMiddleware, upload.single("avatar"), async (req, res) => {
+router.put("/profile/avatar", authMiddleware, upload.single("avatar"), async (req: AuthReq, res: AuthRes) => {
   try {
     const userId = req.user.id;
     const avatarData = req.file.buffer.toString("base64"); // Convert image to Base64
@@ -85,7 +80,7 @@ router.put("/profile/avatar", authMiddleware, upload.single("avatar"), async (re
 
     res.status(200).json({ message: "Avatar updated successfully" });
   } catch (error) {
-    console.error("❌ Avatar Upload Error:", error);
+    console.error("Avatar Upload Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });

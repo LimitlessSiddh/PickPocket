@@ -1,5 +1,3 @@
-import Profile from "../pages/Profile";
-
 declare global{
     type User = {
         id: number;

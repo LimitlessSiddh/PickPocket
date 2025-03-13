@@ -4,7 +4,7 @@ import admin from 'firebase-admin'
 
 dotenv.config();
 
-const serviceAccount = process.env.VITE_FIREBASE_PRIVATE_KEY;
+const serviceAccount : string = process.env.VITE_FIREBASE_PRIVATE_KEY!;
 
 
 

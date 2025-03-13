@@ -8,7 +8,7 @@ const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
 const MAX_API_RETRIES = 3;
 
 /**
- * ✅ Validate & Update Bets from API
+ * Validate & Update Bets from API
  * - Handles API failures gracefully
  * - Retries API calls up to MAX_API_RETRIES times
  * - Prevents quota overuse
@@ -18,15 +18,14 @@ async function validateBets() {
   try {
     console.log("🔄 Running bet validation...");
 
-    // ✅ Fetch pending bets
     const pendingBets = await pool.query("SELECT * FROM bets WHERE result = 'pending'");
     if (pendingBets.rows.length === 0) {
-      console.log("✅ No pending bets to validate.");
+      console.log("No pending bets to validate.");
       return { message: "No pending bets to validate." };
     }
 
-    let updatedBets = [];
-    const fetchedSports = new Set(); // ✅ Track already fetched sports
+    let updatedBets: PastBet[] = [];
+    const fetchedSports = new Set();
 
     for (let bet of pendingBets.rows) {
       if (!bet.sport_key) continue;
@@ -47,18 +46,18 @@ async function validateBets() {
           );
 
           if (response.data.error_code === "OUT_OF_USAGE_CREDITS") {
-            console.error("❌ API Quota Exceeded. Stopping validation.");
+            console.error("API Quota Exceeded. Stopping validation.");
             return { message: "API quota exceeded. Try again later." };
           }
 
-          fetchedSports.add(bet.sport_key); // ✅ Mark this sport as fetched
+          fetchedSports.add(bet.sport_key); //Mark this sport as fetched
 
           const match = response.data.find((m) => m.id === bet.match_id);
           if (!match || !match.completed) break;
 
-          console.log(`✅ Match ${bet.match_id} completed. Checking winner...`);
-          const homeScore = match.scores?.find((s) => s.name === match.home_team)?.score;
-          const awayScore = match.scores?.find((s) => s.name === match.away_team)?.score;
+          console.log(`Match ${bet.match_id} completed. Checking winner...`);
+          const homeScore: Score = match.scores?.find((s) => s.name === match.home_team)?.score;
+          const awayScore: Score = match.scores?.find((s) => s.name === match.away_team)?.score;
 
           let winningTeam = homeScore > awayScore ? match.home_team : match.away_team;
           let matchResult = winningTeam === bet.team_selected ? "win" : "loss";
@@ -69,10 +68,18 @@ async function validateBets() {
             [matchResult, profitLoss, bet.id]
           );
 
-          updatedBets.push({ id: bet.id, result: matchResult, profitLoss });
+          updatedBets.push({
+            id: bet.id,        
+            user_id: bet.user_id,   
+            sport_key: bet.sport_key, 
+            odds: bet.odds,      
+            match_id: bet.match_id,
+            result: matchResult,     
+            profit_loss: profitLoss   
+          });
           success = true;
         } catch (error) {
-          console.error(`❌ Error validating bet ${bet.id}, Attempt ${retryCount + 1}:`, error);
+          console.error(`Error validating bet ${bet.id}, Attempt ${retryCount + 1}:`, error);
           retryCount++;
         }
       }
@@ -80,7 +87,7 @@ async function validateBets() {
 
     return { message: "Bets validated successfully!", updatedBets };
   } catch (error) {
-    console.error("❌ Critical error validating bets:", error);
+    console.error("Critical error validating bets:", error);
     return { message: "Server error during bet validation." };
   }
 }

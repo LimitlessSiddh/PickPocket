@@ -4,30 +4,29 @@ import pool from "../config/db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import dotenv from "dotenv";
 
+
 dotenv.config();
 
 const router = express.Router();
-const ODDS_API_KEY = process.env.ODDS_API_KEY;
+const ODDS_API_KEY: string = process.env.ODDS_API_KEY!;
 const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
 
-/**
- * ✅ Place a Bet with Correct Match ID Format
- */
-router.post("/", authMiddleware, async (req, res) => {
-  console.log("🔍 Incoming Bet Request...");
+
+router.post("/", authMiddleware, async (req: AuthReq, res: AuthRes) => {
+
   if (!req.user || !req.user.id) {
     return res.status(401).json({ message: "You must be logged in to place a bet." });
   }
 
   try {
-    const { betType, bets } = req.body;
+    const { bets } = req.body;
     const userId = req.user.id;
 
     if (!bets || bets.length === 0) {
       return res.status(400).json({ message: "No bets provided." });
     }
 
-    const insertedBets = [];
+    const insertedBets: Bet[] = [];
     for (const bet of bets) {
       const { match_id, team_selected, odds, sport_key } = bet;
 
@@ -35,7 +34,6 @@ router.post("/", authMiddleware, async (req, res) => {
         return res.status(400).json({ message: "Invalid bet format. Missing required fields." });
       }
 
-      // ✅ Fetch correct match ID format from API
       const response = await axios.get(
         `${ODDS_API_URL}${sport_key}/scores/`,
         { params: { apiKey: ODDS_API_KEY } }
@@ -56,15 +54,12 @@ router.post("/", authMiddleware, async (req, res) => {
 
     res.status(201).json({ message: "Bets placed successfully!", bets: insertedBets });
   } catch (error) {
-    console.error("❌ Betting Error:", error);
+    console.error("Betting Error:", error);
     res.status(500).json({ message: "Server error. Try again later." });
   }
 });
 
-/**
- * ✅ Validate & Update Bets from API
- */
-router.put("/update-results", async (req, res) => {
+router.put("/update-results", async (req: AuthReq, res: AuthRes) => {
   try {
     console.log("🔄 Running bet validation...");
     const pendingBets = await pool.query("SELECT * FROM bets WHERE result = 'pending'");
@@ -72,22 +67,22 @@ router.put("/update-results", async (req, res) => {
       return res.json({ message: "No pending bets to validate." });
     }
 
-    let updatedBets = [];
+    let updatedBets: Bet[] | PastBet[] = [];
     for (let bet of pendingBets.rows) {
       if (!bet.sport_key) continue;
       try {
-        console.log("🔄 Fetching results for sport:", bet.sport_key);
+
         const response = await axios.get(
           `${ODDS_API_URL}${bet.sport_key}/scores/`,
           { params: { apiKey: ODDS_API_KEY } }
         );
 
-        const match = response.data.find((m) => m.id === bet.match_id);
+        const match = response.data.find((m: Match) => m.id === bet.match_id);
         if (!match || !match.completed) continue;
 
-        console.log(`✅ Match ${bet.match_id} completed. Checking winner...`);
-        const homeScore = match.scores?.find((s) => s.name === match.home_team)?.score;
-        const awayScore = match.scores?.find((s) => s.name === match.away_team)?.score;
+        console.log(`Match ${bet.match_id} completed. Checking winner...`);
+        const homeScore = match.scores?.find((s: Score) => s.name === match.home_team)?.score;
+        const awayScore = match.scores?.find((s: Score) => s.name === match.away_team)?.score;
 
         let winningTeam = homeScore > awayScore ? match.home_team : match.away_team;
         let matchResult = winningTeam === bet.team_selected ? "win" : "loss";
@@ -98,15 +93,23 @@ router.put("/update-results", async (req, res) => {
           [matchResult, profitLoss, bet.id]
         );
 
-        updatedBets.push({ id: bet.id, result: matchResult, profitLoss });
+        updatedBets.push({
+          id: bet.id,
+          user_id: bet.user_id,
+          sport_key: bet.sport_key,
+          odds: bet.odds,
+          match_id: bet.match_id,
+          result: matchResult,
+          profit_loss: profitLoss
+        });
       } catch (error) {
-        console.error(`❌ Error validating bet ${bet.id}:`, error);
+        console.error(`Error validating bet ${bet.id}:`, error);
       }
     }
 
     res.json({ message: "Bets validated successfully!", updatedBets });
   } catch (error) {
-    console.error("❌ Error validating bets:", error);
+    console.error("Error validating bets:", error);
     res.status(500).json({ message: "Server error during bet validation." });
   }
 });
