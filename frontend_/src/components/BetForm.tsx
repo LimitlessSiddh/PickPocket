@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 const BetForm = () => {
   const [bet, setBet] = useState("");
   const [odds, setOdds] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Bet Submitted:", { bet, odds });
     setBet("");

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ user, setUser }) => {
+const Navbar = ({ user, setUser }: NavbarProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -12,7 +12,7 @@ const Navbar = ({ user, setUser }) => {
   };
 
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = (): void => {
       if (window.innerWidth >= 768) {
         setMenuOpen(false); 
       }
@@ -34,7 +34,7 @@ const Navbar = ({ user, setUser }) => {
 
         <div className="flex items-center md:hidden">
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={():void => setMenuOpen(!menuOpen)}
             className="text-white"
           >
             <svg
@@ -60,14 +60,14 @@ const Navbar = ({ user, setUser }) => {
           {user ? (
             <>
               <Link
-                onClick={() => setMenuOpen(false)}
+                onClick={():void => setMenuOpen(false)}
                 to="/profile"
                 className="text-white hover:text-gray-300 transition block px-4 py-2"
               >
                 {user.username}
               </Link>
               <button
-                onClick={() => {handleLogout; setMenuOpen(false)}}
+                onClick={():void => {handleLogout(); setMenuOpen(false)}}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition block"
               >
                 Logout
@@ -75,7 +75,7 @@ const Navbar = ({ user, setUser }) => {
             </>
           ) : (
             <Link
-              onClick={() => setMenuOpen(false)}
+              onClick={():void => setMenuOpen(false)}
               to="/login"
               className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
             >
@@ -83,7 +83,7 @@ const Navbar = ({ user, setUser }) => {
             </Link>
           )}
           <Link
-            onClick={() => setMenuOpen(false)}
+            onClick={():void => setMenuOpen(false)}
             to="/leaderboard"
             className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
           >

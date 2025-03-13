@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
+const BetSlip = ({ bets, setBets, user, setShowBetSlip }: BetSlipProps) => {
   console.log("User received in BetSlip:", user);
-  const [betType, setBetType] = useState("single");
-  const [totalMultiplier, setTotalMultiplier] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [betType, setBetType] = useState<string>("single");
+  const [totalMultiplier, setTotalMultiplier] = useState<string>("1");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -16,14 +16,14 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
 
   useEffect(() => {
     if (betType === "parlay" && bets.length > 1) {
-      const multiplier = bets.reduce((acc, bet) => acc * parseFloat(bet.odds), 1);
+      const multiplier = bets.reduce((acc, bet) => acc * bet.odds, 1);
       setTotalMultiplier(multiplier.toFixed(2));
     } else {
-      setTotalMultiplier(1);
+      setTotalMultiplier("1");
     }
   }, [bets, betType]);
 
-  const handleRemoveBet = (index) => {
+  const handleRemoveBet = (index: number) => {
     const updatedBets = [...bets];
     updatedBets.splice(index, 1);
     setBets(updatedBets);
@@ -70,8 +70,15 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
       console.log("API Match Data:", matchData);
   
       const formattedBets = bets.map((bet) => {
+
+        type Match = {
+          id: number;
+          home_team: string;
+          away_team: string;
+        }
+
         const match = matchData.find(
-          (m) => m.home_team === bet.team_selected || m.away_team === bet.team_selected
+          (m: Match) => m.home_team === bet.team_selected || m.away_team === bet.team_selected
         );
   
         if (!match) {
@@ -104,9 +111,15 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
       console.log("Bet submitted successfully:", response.data);
       setBets([]);
       setShowBetSlip(false);
-    } catch (err) {
-      console.error("Bet submission error:", err.response?.data || err);
-      setError("Failed to submit bet. Try again.");
+    } catch (err: unknown) {
+      if(err instanceof Error){
+        console.error("Bet submission error:", err.message);
+        setError("Failed to submit bet. Try again.");
+      } else {
+        console.error("Unknown error:", err);
+        setError("Failed to submit bet. Try again.");
+      }
+      
     } finally {
       setIsSubmitting(false);
     }
@@ -116,7 +129,7 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
     <div className={`betslip-container ${bets.length > 0 ? "show" : "hide"}`}>
       <div className="betslip-header">
         <h2>Bet Slip</h2>
-        <button className="close-betslip" onClick={() => setShowBetSlip(false)}>❌</button>
+        <button className="close-betslip" onClick={():void => setShowBetSlip(false)}>❌</button>
       </div>
 
       <div className="bet-type">
@@ -125,7 +138,7 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
             type="radio"
             value="single"
             checked={betType === "single"}
-            onChange={() => setBetType("single")}
+            onChange={():void => setBetType("single")}
           />
           Single Bets
         </label>
@@ -134,7 +147,7 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
             type="radio"
             value="parlay"
             checked={betType === "parlay"}
-            onChange={() => setBetType("parlay")}
+            onChange={():void => setBetType("parlay")}
             disabled={bets.length < 2}
           />
           Parlay
@@ -148,7 +161,7 @@ const BetSlip = ({ bets, setBets, user, setShowBetSlip }) => {
           {bets.map((bet, index) => (
             <li key={index} className="bet-item">
               <span>{bet.teams} @ {bet.odds}</span>
-              <button className="remove-bet" onClick={() => handleRemoveBet(index)}>❌</button>
+              <button className="remove-bet" onClick={():void => handleRemoveBet(index)}>❌</button>
             </li>
           ))}
         </ul>

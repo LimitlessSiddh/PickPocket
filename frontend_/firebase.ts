@@ -1,5 +1,4 @@
 import { initializeApp} from 'firebase/app';
-import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 
@@ -14,8 +13,7 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID, 
   };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+initializeApp(firebaseConfig);
 
 export const firebase_auth = getAuth();
 export const googleProvider = new GoogleAuthProvider();

@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import GoogleSignButton from "../components/GoogleButton";
+import GoogleButton from "../components/GoogleButton";
 
-const Login = ({ setUser }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+const Login = ({ setUser }: LoginPageProps) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      console.log("🔍 Sending login request...");
+      console.log("Sending login request...");
       const response = await axios.post("http://localhost:5002/api/auth/login", {
         email,
         password,
@@ -38,9 +38,15 @@ const Login = ({ setUser }) => {
         console.error("No token received.");
         setError("Invalid email or password");
       }
-    } catch (err) {
-      console.error(" Login error:", err.response?.data || err);
-      setError("Invalid email or password");
+    } catch (err:unknown) {
+      if(err instanceof Error){
+        console.error(" Login error:", err.message);
+        setError("Invalid email or password");
+      } else {
+        console.error("Unknown error:", err);
+        setError("Something went wrong. Please try again.");
+      }
+
     } finally {
       setLoading(false);
     }
@@ -61,7 +67,7 @@ const Login = ({ setUser }) => {
               type="email"
               placeholder="Email Address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e):void => setEmail(e.target.value)}
               required
               disabled={loading}
               className="w-full px-4 py-3 bg-gray-800 text-white rounded-md border border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-400 outline-none disabled:opacity-50"
@@ -73,7 +79,7 @@ const Login = ({ setUser }) => {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e):void => setPassword(e.target.value)}
               required
               disabled={loading}
               className="w-full px-4 py-3 bg-gray-800 text-white rounded-md border border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-400 outline-none disabled:opacity-50"
@@ -97,7 +103,7 @@ const Login = ({ setUser }) => {
         </p>
 
         <div className="flex justify-center items-center mt-4">
-          <GoogleSignButton setUser={setUser} setError={setError} />
+          <GoogleButton setUser={setUser} setError={setError} />
         </div>
       </div>
     </div>

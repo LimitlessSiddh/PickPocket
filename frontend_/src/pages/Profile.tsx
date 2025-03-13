@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const Profile = ({ user }) => {
+const Profile = ({ user }: ProfilePageProps) => {
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [error, setError] = useState("");
@@ -62,7 +62,7 @@ const Profile = ({ user }) => {
             </tr>
           </thead>
           <tbody>
-            {history.map((bet, index) => (
+            {history.map((bet: PastBet, index: number) => (
               <tr key={index} className={bet.result}>
                 <td>{bet.match_id}</td>
                 <td>{bet.team_selected}</td>

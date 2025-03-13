@@ -4,11 +4,11 @@ import axios from "axios";
 const Leaderboard = () => {
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("roi");
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
+    const fetchLeaderboard = async (): Promise<void> => {
       try {
         const response = await axios.get("http://localhost:5002/api/leaderboard");
         setLeaders(response.data);
@@ -23,9 +23,8 @@ const Leaderboard = () => {
     fetchLeaderboard();
   }, []);
 
-  const filteredLeaders = [...leaders].sort((a, b) => {
-    if (filter === "roi") return b.roi - a.roi;
-    if (filter === "win_pct") return (b.wins / (b.total_bets || 1)) - (a.wins / (a.total_bets || 1));
+  const filteredLeaders = [...leaders].sort((a: User, b: User) => {
+    if (filter === "win_pct") return (b.total_wins / (b.total_bets || 1)) - (a.total_wins / (a.total_bets || 1));
     if (filter === "streaks") return b.longest_win_streak - a.longest_win_streak;
     return b.total_bets - a.total_bets;
   });
@@ -62,7 +61,7 @@ const Leaderboard = () => {
             <span>🔥 Streak</span>
           </div>
 
-          {filteredLeaders.map((leader, index) => (
+          {filteredLeaders.map((leader: User, index) => (
             <div
               key={index}
               className={`grid grid-cols-6 items-center p-2 border-b ${
@@ -72,8 +71,8 @@ const Leaderboard = () => {
               <span className="font-semibold">#{index + 1}</span>
               <span className="font-medium">{leader.username}</span>
               <span>{leader.total_bets}</span>
-              <span>{((leader.wins / (leader.total_bets || 1)) * 100).toFixed(1)}%</span>
-              <span>{leader.roi}%</span>
+              <span>{((leader.total_wins / (leader.total_bets || 1)) * 100).toFixed(1)}%</span>
+              <span>{leader.points}%</span>
               <span className="text-red-500 font-bold">🔥 {leader.longest_win_streak} Wins</span>
             </div>
           ))}

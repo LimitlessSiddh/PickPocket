@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import BetSlip from "../components/BetSlip";
 
-const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
-  const [odds, setOdds] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastFetched, setLastFetched] = useState(0);
-  const API_KEY = "5547690b7fe24b9ec6904dee468982d0";
-  const CACHE_DURATION = 300000; // ✅ Cache odds for 5 minutes (300,000 ms)
+const BettingPage = ({ user, bets, setBets, setShowBetSlip }: BettingPageProps) => {
+  const [odds, setOdds] = useState<Match[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastFetched, setLastFetched] = useState<number>(0);
+  const CACHE_DURATION = 300000;
+  const API_KEY = "API_KEY";
 
   useEffect(() => {
     const fetchOdds = async () => {
@@ -33,16 +33,16 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
         );
 
         if (response.data.error_code === "OUT_OF_USAGE_CREDITS") {
-          console.error("❌ API Quota Exceeded. Stopping requests.");
+          console.error(" API Quota Exceeded. Stopping requests.");
           setError("API quota exceeded. Try again later.");
           return;
         }
 
         setOdds(response.data);
         setLastFetched(now);
-        console.log("✅ Odds Fetched:", response.data);
+        console.log("Odds Fetched:", response.data);
       } catch (error) {
-        console.error("❌ Error fetching odds:", error);
+        console.error(" Error fetching odds:", error);
         setError("Failed to load betting odds.");
       } finally {
         setLoading(false);
@@ -52,11 +52,36 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
     fetchOdds();
   }, [lastFetched]);
 
-  const addToBetSlip = (match, outcome) => {
+  type Match = {
+    id: number;
+    home_team: string;
+    away_team: string;
+    sport_key: string;
+    sport_title: string;
+    bookmakers: {
+      title: string;
+      markets: {
+        key: string;
+        outcomes: {
+          name: string;
+          price: number;
+        }[];
+      }[];
+    }[];
+  }
+
+  type Outcome = {
+    price: number;
+    name: string;
+  }
+
+  const addToBetSlip = (match: Match, outcome: Outcome) => {
     if (!user) {
       alert("You must be logged in to place a bet.");
       return;
     }
+
+
 
     const newBet = {
       match_id: match.id,
@@ -64,6 +89,10 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
       odds: outcome.price,
       sport_key: match.sport_key,
       teams: `${match.home_team} vs ${match.away_team}`,
+      id: Date.now(), // Using a timestamp as an ID
+      user_id: user.id, // Assuming `user` has an `id` property
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     setBets([...bets, newBet]);
@@ -74,12 +103,12 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }) => {
     <div className="betting-container">
       <h2 className="betting-title">📊 Latest Betting Odds</h2>
 
-      {loading && <p className="loading-message">🔄 Loading odds...</p>}
+      {loading && <p className="loading-message">Loading odds...</p>}
       {error && <p className="error-message">❌ {error}</p>}
 
       {!loading && !error && odds.length > 0 && (
         <div className="odds-grid">
-          {odds.map((match) => (
+          {odds.map((match: Match) => (
             <div key={match.id} className="bet-card">
               <h3 className="sport-title">{match.sport_title}</h3>
               <p className="match-title">{match.home_team} vs {match.away_team}</p>

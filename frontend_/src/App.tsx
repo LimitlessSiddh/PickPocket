@@ -11,11 +11,12 @@ import BetSlip from "./components/BetSlip";
 import axios from "axios";
 import "./index.css";
 
+
 function App() {
-  const [user, setUser] = useState(null);
-  const [bets, setBets] = useState([]);
-  const [returnPercentage, setReturnPercentage] = useState(0);
-  const [showBetSlip, setShowBetSlip] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [bets, setBets] = useState<Bet[]>([]);
+  const [returnPercentage, setReturnPercentage] = useState<number>(0);
+  const [showBetSlip, setShowBetSlip] = useState<boolean>(false);
 
   useEffect(() => {
     console.log("Stored Token:", localStorage.getItem("token"));
@@ -45,7 +46,7 @@ function App() {
     fetchProfile();
   }, []);
 
-  const fetchUserBets = async () => {
+  const fetchUserBets = async (): Promise<void> => {
     if (!user) return;
 
     try {

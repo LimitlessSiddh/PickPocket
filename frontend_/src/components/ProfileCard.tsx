@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const ProfileCard = ({ user, stats }) => {
+const ProfileCard = ({ user, stats }: ProfileCardProps) => {
   const [newUsername, setNewUsername] = useState("");
   const [avatar, setAvatar] = useState(user.avatar || "");
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ const ProfileCard = ({ user, stats }) => {
       setSuccess("Profile updated successfully!");
     } catch (err) {
       setError("Failed to update profile.");
-      console.error("❌ Update Error:", err);
+      console.error("Update Error:", err);
     }
   };
 

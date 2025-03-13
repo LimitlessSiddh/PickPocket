@@ -5,7 +5,7 @@ const BetButton = () => {
 
   return (
     <div className="bet-button-container">
-      <button className="bet-button" onClick={() => navigate("/select-bets")}>
+      <button className="bet-button" onClick={async (): Promise<void> => navigate("/select-bets")}>
         Make Your Picks
       </button>
     </div>
