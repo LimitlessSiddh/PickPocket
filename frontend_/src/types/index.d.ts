@@ -1,4 +1,5 @@
 declare global{
+
     type User = {
         id: number;
         username: string;
@@ -9,10 +10,22 @@ declare global{
         total_wins: number;
         total_losses: number;
         points: number;
+        tier: string;
         current_win_streak: number;
         current_loss_streak: number;
         longest_win_streak: number;
         longest_loss_streak: number ;
+        subs: User[];
+        subscriptions: Subscription[];
+        subCount: number
+    }
+
+    type Subscription = {
+        price: number;
+        sub_to: User;
+        subscriber: User;
+        created_at: string | null;
+        updated_at: string | null;
     }
 
     type Bet = {
@@ -32,11 +45,16 @@ declare global{
         profit_loss: number;
     }
 
+
     interface BetSlipProps {
         bets: Bet[];
         setBets: React.Dispatch<React.SetStateAction<Bet[]>>;
         user: User | null;
         setShowBetSlip: React.Dispatch<React.SetStateAction<boolean>>;
+        fetchUserBets?: () => Promise<void>;
+        returnPercentage? : number;
+        setReturnPercentage?: React.Dispatch<React.SetStateAction<number>>;
+
     }
 
     interface GoogleButtonProps {
@@ -63,15 +81,23 @@ declare global{
     }
 
     interface BettingPageProps extends BetSlipProps{
-        setError: React.Dispatch<React.SetStateAction<string | null>>;
+        setError?: React.Dispatch<React.SetStateAction<string | null>>;
     }
 
     interface ProfilePageProps {
         user: User;
+        fetchUserBets: () => Promise<void>;
     }
 
     interface LoginPageProps {
         setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    }
+
+    interface RegisterPageProps extends LoginPageProps {
+    }
+
+    interface SubscriptionPage{
+        user: User;
     }
     
 }

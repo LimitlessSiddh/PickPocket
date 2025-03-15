@@ -3,11 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import GoogleSignButton from "../components/GoogleButton";
 
-const Register = ({ setUser }) => {
+const Register = ({ setUser }: RegisterPageProps) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

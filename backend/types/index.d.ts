@@ -18,6 +18,14 @@ declare global {
         longest_loss_streak: number ;
     }
 
+    type Subscription = {
+        price: number;
+        sub_to: User;
+        subscriber: User;
+        created_at: string | null;
+        updated_at: string | null;
+    }
+
     interface AuthReq extends Request {
         user?: any;
         file?: any;

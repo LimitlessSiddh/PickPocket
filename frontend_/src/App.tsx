@@ -8,6 +8,7 @@ import BettingPage from "./pages/BettingPage";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import BetSlip from "./components/BetSlip";
+import SubsPage from "./pages/Subs";
 import axios from "axios";
 import "./index.css";
 
@@ -71,8 +72,9 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={user ? <Profile user={user} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+
+          <Route path="/profile" element={user ? <Profile user={user} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace/>} />
           <Route 
             path="/betting" 
             element={user ? (
@@ -86,9 +88,10 @@ function App() {
                 fetchUserBets={fetchUserBets}
               />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" replace />
             )}
           />
+          <Route path="/subscriptions" element={user? <SubsPage user = {user}/>: <Navigate to="/" replace/>}></Route>
           <Route path="/register" element={<Register setUser={setUser} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
