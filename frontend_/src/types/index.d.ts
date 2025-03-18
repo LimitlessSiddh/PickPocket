@@ -99,6 +99,12 @@ declare global{
     interface SubscriptionPage{
         user: User;
     }
+
+    interface SetUsernameProps{
+        email: string;
+        setUser: Function;
+        setError?: React.Dispatch<React.SetStateAction<string | null>>;
+    }
     
 }
 

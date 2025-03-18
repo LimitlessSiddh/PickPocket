@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
-import pool from "../config/db.js";
-import authMiddleware from "../middleware/authMiddleware.js";
+import pool from "../config/db.ts";
+import authMiddleware from "../middleware/authMiddleware.ts";
 import dotenv from "dotenv";
 
 

@@ -14,7 +14,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
   useEffect(() => {
     const handleResize = (): void => {
       if (window.innerWidth >= 768) {
-        setMenuOpen(false); 
+        setMenuOpen(false);
       }
     };
 
@@ -34,7 +34,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
 
         <div className="flex items-center md:hidden">
           <button
-            onClick={():void => setMenuOpen(!menuOpen)}
+            onClick={(): void => setMenuOpen(!menuOpen)}
             className="text-white"
           >
             <svg
@@ -60,14 +60,20 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
           {user ? (
             <>
               <Link
-                onClick={():void => setMenuOpen(false)}
+                onClick={(): void => setMenuOpen(false)}
                 to="/profile"
                 className="text-white hover:text-gray-300 transition block px-4 py-2"
               >
                 {user.username}
               </Link>
+              <Link
+                onClick={(): void => setMenuOpen(false)}
+                to="/subscriptions"
+                className="text-white hover:text-gray-300 transition block px-4 py-2"
+              >
+              </Link>
               <button
-                onClick={():void => {handleLogout(); setMenuOpen(false)}}
+                onClick={(): void => { handleLogout(); setMenuOpen(false) }}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition block"
               >
                 Logout
@@ -75,7 +81,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
             </>
           ) : (
             <Link
-              onClick={():void => setMenuOpen(false)}
+              onClick={(): void => setMenuOpen(false)}
               to="/login"
               className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
             >
@@ -83,7 +89,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
             </Link>
           )}
           <Link
-            onClick={():void => setMenuOpen(false)}
+            onClick={(): void => setMenuOpen(false)}
             to="/leaderboard"
             className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
           >

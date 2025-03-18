@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import SportLogos from "../components/SportLogos";
 
-const Home = () => {
+const Home = ({user}: {user: User | null}) => {
   const navigate = useNavigate();
 
   return (
@@ -21,7 +21,7 @@ const Home = () => {
           className="px-6 py-4 text-lg font-bold italic border-2 border-gray-300 bg-[#202334] text-slate-300 rounded-md 
                      transition transform hover:scale-110 hover:bg-white hover:text-[#253a4a] hover:shadow-lg 
                      active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500"
-          onClick={() => navigate("/betting")}
+          onClick={() => user? navigate("/betting"): navigate("/login")}
         >
           Let's Fleece
         </button>

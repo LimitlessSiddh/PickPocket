@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import pool from "../config/db.ts";
 import axios from "axios";
 import dotenv from "dotenv";
 

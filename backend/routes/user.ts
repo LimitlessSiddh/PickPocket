@@ -1,6 +1,6 @@
 import express from "express";
-import pool from "../config/db.js";
-import authMiddleware from "../middleware/authMiddleware.js"; // Protect Routes
+import pool from "../config/db.ts";
+import authMiddleware from "../middleware/authMiddleware.ts"; // Protect Routes
 import multer from "multer"; // For image uploads
 import bcrypt from "bcryptjs";
 

@@ -71,7 +71,7 @@ function App() {
       <Navbar user={user} setUser={setUser}/>
       <div className="app-container">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home user={user} />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
 
           <Route path="/profile" element={user ? <Profile user={user} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace/>} />
