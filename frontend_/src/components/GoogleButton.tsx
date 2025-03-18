@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { firebase_auth } from '../../firebase';
 import google_img from "../assets/google_logo.png";
-import SetUsernameForm from './SetUserName';
+// import SetUsernameForm from './SetUserName';
 import { useState } from 'react';
 
 const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
@@ -28,15 +28,11 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
             const backend_response = response.data;
 
             if (backend_response.success) {
-                const user : User = backend_response.user;
+                const user: User = backend_response.user;
                 setUser(user);
 
-                if(user.username){
-                    navigate("/profile");
-                } else {
-                    setEmail(user.email);
-                    setShowUsernameForm(true);
-                }
+                navigate("/profile");
+
 
             } else {
                 console.log("failed google login after backend response");
@@ -57,7 +53,6 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
     }
     return (
         <>
-        {!showUsernameForm ? (
             <button onClick={handleGoogleAuth} className="flex items-center justify-center p-3">
                 <img
                     className='w-auto h-8 hover: transition-transform duration-500 ease-in-out transform hover:scale-[1.2]'
@@ -65,10 +60,8 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
                     alt="Google sign in"
                 />
             </button>
-        ) : (
-            <SetUsernameForm email={email} setUser={setUser} setError={setError} />
-        )}
-    </>
+
+        </>
     );
 }
 
