@@ -69,13 +69,13 @@ async function validateBets() {
           );
 
           updatedBets.push({
-            id: bet.id,        
-            user_id: bet.user_id,   
-            sport_key: bet.sport_key, 
-            odds: bet.odds,      
-            match_id: bet.match_id,
-            result: matchResult,     
-            profit_loss: profitLoss   
+            id: bet.id as number,        
+            user_id: bet.user_id as number,   
+            sport_key: bet.sport_key as string, 
+            odds: bet.odds as number,      
+            match_id: bet.match_id as string,
+            result: matchResult as "win" | "loss",     
+            profit_loss: profitLoss as number
           });
           success = true;
         } catch (error) {

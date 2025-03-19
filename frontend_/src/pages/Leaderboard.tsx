@@ -49,7 +49,7 @@ const Leaderboard = () => {
 
       {loading && <p className="text-gray-600 text-lg">Loading leaderboard...</p>}
       {error && <p className="text-red-500">{error}</p>}
-
+      
       {!loading && !error && (
         <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-4">
           <div className="grid grid-cols-6 bg-gray-200 text-gray-700 font-semibold p-2 rounded-lg">

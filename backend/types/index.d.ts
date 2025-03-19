@@ -15,7 +15,7 @@ declare global {
         current_win_streak: number;
         current_loss_streak: number;
         longest_win_streak: number;
-        longest_loss_streak: number ;
+        longest_loss_streak: number;
     }
 
     type Subscription = {
@@ -35,27 +35,30 @@ declare global {
         user?: any;
     }
 
-    type Bet = {
+
+
+    interface Bet {
         id: number;
         user_id: number;
-        teams?: string;
+        match_id: string;
         team_selected?: string;
-        sport_key: string;
         odds: number;
-        match_id: number;
-        created_at?: string | null;
-        updated_at?: string | null;
+        amount_wagered?: number;
+        result: string;
+        winnings?: number;
+        profit_loss?: number;
+        sport_key: string;
     }
 
-    type PastBet = Bet & {
-        result: string;
+    interface PastBet extends Bet {
         profit_loss: number;
     }
+
 
     type Score = {
         name: string;
         score: number;
-      };
+    };
 
 
     type Match = {

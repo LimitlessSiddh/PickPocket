@@ -148,7 +148,8 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
 
     const decoded_token = await admin.auth().verifyIdToken(token);
     const email = decoded_token.email;
-    let user;
+    const username = decoded_token.name;
+    let user: User;
 
     // check if in db alr
     const existingUser = await pool.query(
@@ -188,13 +189,13 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
 
     } else {
       const newUser = await pool.query(
-        "INSERT INTO users ( email) VALUES ($1) RETURNING id, email",
-        [email]
+        "INSERT INTO users ( email, username) VALUES ($1, $2) RETURNING id, email",
+        [email, username]
       );
       user = newUser.rows[0]
 
       const jwtToken = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, username: user.username },
         JWT_SECRET,
         { expiresIn: "3h" }
       );
@@ -209,7 +210,7 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
       return res.status(200).send({
         success: true,
         message: "Google Authentication Successful, Please set username",
-        user: { id: user.id, email: user.email },
+        user: { id: user.id, email: user.email, user: user.username},
       });
     }
 

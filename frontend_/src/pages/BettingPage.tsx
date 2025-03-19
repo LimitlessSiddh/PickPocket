@@ -113,8 +113,8 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }: BettingPageProps) 
   }, [bets]);
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6 flex flex-col items-center">
-      <h2 className="text-2xl font-bold text-[#202334] mb-6 text-center">
+    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
+      <h2 className="text-2xl font-bold text-[#202334] mb-6 text-center mt-20">
         📊 Latest Betting Odds
       </h2>
 

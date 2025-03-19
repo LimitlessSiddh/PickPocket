@@ -1,7 +1,6 @@
 import express from "express";
 import pool from "../config/db.ts";
 import authMiddleware from "../middleware/authMiddleware.ts";
-import { auth } from "firebase-admin";
 
 const router = express.Router();
 

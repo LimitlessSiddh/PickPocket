@@ -1,7 +1,7 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import pool from "./config/db.ts";
 import authRoutes from "./routes/auth.ts";
 import betRoutes from "./routes/bets.ts"; 
 import userRoutes from "./routes/user.ts";

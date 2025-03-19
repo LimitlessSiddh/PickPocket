@@ -57,24 +57,40 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
         <nav
           className={`md:flex items-center gap-6 ${menuOpen ? "block absolute bg-[#0a192f] w-full left-0 top-full py-4 transition-all duration-1000 ease-in-out" : "hidden md:block"}`}
         >
+          <Link
+            onClick={(): void => setMenuOpen(false)}
+            to="/leaderboard"
+            className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
+          >
+            Leaderboard
+          </Link>
           {user ? (
             <>
               <Link
                 onClick={(): void => setMenuOpen(false)}
-                to="/profile"
-                className="text-white hover:text-gray-300 transition block px-4 py-2"
+                to={`/${user.username}`}
+                className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
               >
-                {user.username}
+                MyProfile
               </Link>
               <Link
                 onClick={(): void => setMenuOpen(false)}
-                to="/subscriptions"
-                className="text-white hover:text-gray-300 transition block px-4 py-2"
+                to={"/betting"}
+                className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
               >
+                Bets
+              </Link>
+
+              <Link
+                onClick={(): void => setMenuOpen(false)}
+                to="/subscriptions"
+                className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
+              >
+                Subscriptions
               </Link>
               <button
                 onClick={(): void => { handleLogout(); setMenuOpen(false) }}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition block"
+                className="text-red-600 text-lg hover:text-red-900 transition block px-4 py-2"
               >
                 Logout
               </button>
@@ -88,13 +104,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
               Login
             </Link>
           )}
-          <Link
-            onClick={(): void => setMenuOpen(false)}
-            to="/leaderboard"
-            className="text-white text-lg hover:text-gray-400 transition block px-4 py-2"
-          >
-            Leaderboard
-          </Link>
+
         </nav>
       </div>
     </header>

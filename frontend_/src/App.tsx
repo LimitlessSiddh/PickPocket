@@ -74,7 +74,10 @@ function App() {
           <Route path="/" element={<Home user={user} />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
 
-          <Route path="/profile" element={user ? <Profile user={user} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace/>} />
+          {
+            user &&
+          <Route path={`/${user.username}`} element={user ? <Profile user={user as User} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace/>} />
+          }
           <Route 
             path="/betting" 
             element={user ? (

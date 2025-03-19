@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
-import pool from "../config/db";
-import authMiddleware from "../middleware/authMiddleware";
+import pool from "../config/db.ts";
+import authMiddleware from "../middleware/authMiddleware.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,28 +11,8 @@ const ODDS_API_KEY: string = process.env.ODDS_API_KEY!;
 const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
 
 // ✅ Define Types for Requests and Bets
-interface AuthReq extends express.Request {
-  user?: { id: number };
-}
 
-interface AuthRes extends express.Response {}
 
-interface Bet {
-  id: number;
-  user_id: number;
-  match_id: string;
-  team_selected: string;
-  odds: number;
-  amount_wagered: number;
-  result: string;
-  winnings: number;
-  profit_loss?: number;
-  sport_key: string;
-}
-
-interface PastBet extends Bet {
-  profit_loss: number;
-}
 
 // ✅ POST Route: Submit a Bet
 router.post("/", authMiddleware, async (req: AuthReq, res: AuthRes) => {
@@ -89,7 +69,7 @@ router.post("/", authMiddleware, async (req: AuthReq, res: AuthRes) => {
     res.status(201).json({ message: "Bet placed successfully!", bets: insertedBets });
   } catch (error) {
     console.error("❌ Betting Error:", error);
-    res.status(500).json({ message: "Server error. Please try again later." });
+    res.status(500).json({ message: "Server error. Please try again later.", error });
   }
 });
 
