@@ -1,4 +1,4 @@
-declare global{
+declare global {
 
     type User = {
         id: number;
@@ -14,7 +14,7 @@ declare global{
         current_win_streak: number;
         current_loss_streak: number;
         longest_win_streak: number;
-        longest_loss_streak: number ;
+        longest_loss_streak: number;
         subs: User[];
         subscriptions: Subscription[];
         subCount: number
@@ -53,7 +53,7 @@ declare global{
         user: User | null;
         setShowBetSlip: React.Dispatch<React.SetStateAction<boolean>>;
         fetchUserBets?: () => Promise<void>;
-        returnPercentage? : number;
+        returnPercentage?: number;
         setReturnPercentage?: React.Dispatch<React.SetStateAction<number>>;
 
     }
@@ -66,10 +66,10 @@ declare global{
 
     interface NavbarProps {
         user: User | null;
-        setUser: React.Dispatch<React.SetStateAction<User| null>>;
+        setUser: React.Dispatch<React.SetStateAction<User | null>>;
     }
 
-    interface ProfileCardProps{
+    interface ProfileCardProps {
         user: User;
 
         stats: {
@@ -81,13 +81,17 @@ declare global{
 
     }
 
-    interface BettingPageProps extends BetSlipProps{
+    interface BettingPageProps extends BetSlipProps {
         setError?: React.Dispatch<React.SetStateAction<string | null>>;
     }
 
     interface ProfilePageProps {
         user: User;
         fetchUserBets: () => Promise<void>;
+    }
+
+    interface OtherUserProps {
+        user: User;
     }
 
     interface LoginPageProps {
@@ -97,16 +101,16 @@ declare global{
     interface RegisterPageProps extends LoginPageProps {
     }
 
-    interface SubscriptionPage{
+    interface SubscriptionPage {
         user: User;
     }
 
-    interface SetUsernameProps{
+    interface SetUsernameProps {
         email: string;
         setUser: Function;
         setError?: React.Dispatch<React.SetStateAction<string | null>>;
     }
-    
+
 }
 
-export {}
+export { }

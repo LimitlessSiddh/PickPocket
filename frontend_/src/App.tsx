@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import BetSlip from "./components/BetSlip";
 import SubsPage from "./pages/Subs";
+import OtherUser from "./pages/OtherUser";
 import axios from "axios";
 import "./index.css";
 
@@ -21,7 +22,7 @@ function App() {
 
   useEffect(() => {
     console.log("Stored Token:", localStorage.getItem("token"));
-  
+
     if (!localStorage.getItem("token")) {
       console.log("No token found, user is NULL.");
       return;
@@ -68,33 +69,36 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} setUser={setUser}/>
+      <Navbar user={user} setUser={setUser} />
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home user={user} />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
 
-          {
-            user &&
-          <Route path={`/${user.username}`} element={user ? <Profile user={user as User} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace/>} />
-          }
-          <Route 
-            path="/betting" 
-            element={user ? (
-              <BettingPage 
-                user={user} 
-                bets={bets} 
-                setBets={setBets} 
-                returnPercentage={returnPercentage} 
-                setReturnPercentage={setReturnPercentage} 
-                setShowBetSlip={setShowBetSlip}
-                fetchUserBets={fetchUserBets}
-              />
-            ) : (
-              <Navigate to="/" replace />
-            )}
-          />
-          <Route path="/subscriptions" element={user? <SubsPage user = {user}/>: <Navigate to="/" replace/>}></Route>
+          {user &&
+            <Route path={`/${user.username}`} element={user ? <Profile user={user as User} fetchUserBets={fetchUserBets} /> : <Navigate to="/login" replace />} />
+}
+            <Route
+              path="/betting"
+              element={user ? (
+                <BettingPage
+                  user={user}
+                  bets={bets}
+                  setBets={setBets}
+                  returnPercentage={returnPercentage}
+                  setReturnPercentage={setReturnPercentage}
+                  setShowBetSlip={setShowBetSlip}
+                  fetchUserBets={fetchUserBets}
+                />
+              ) : (
+                <Navigate to="/" replace />
+              )}
+            />
+            &&
+            <Route path="/subscriptions" element={user ? <SubsPage user={user} /> : <Navigate to="/" replace />}></Route>
+            &&
+            <Route path="/:userName" element={<OtherUser user = {user as User}/>}/>
+          
           <Route path="/register" element={<Register setUser={setUser} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="*" element={<Navigate to="/" replace />} />

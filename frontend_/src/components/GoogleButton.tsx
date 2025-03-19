@@ -36,8 +36,6 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
 
             } else {
                 console.log("failed google login after backend response");
-
-
             }
 
 
