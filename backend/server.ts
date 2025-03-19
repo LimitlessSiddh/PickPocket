@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./config/db.ts";
@@ -57,7 +57,7 @@ app.use("/api/bets", betRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
-app.get("/", (req: AuthReq, res: AuthRes) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Backend is running!");
 });
 

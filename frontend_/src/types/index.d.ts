@@ -29,6 +29,7 @@ declare global{
     }
 
     type Bet = {
+        amount_wagered: number;
         id: number;
         user_id: number;
         teams: string;
