@@ -3,17 +3,17 @@ import pool from "../config/db.ts";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser"; 
+import cookieParser from "cookie-parser";
 import admin from "../config/firebaseAdmin.ts";
 
 dotenv.config();
 
-const JWT_SECRET : string = process.env.JWT_SECRET!;
+const JWT_SECRET: string = process.env.JWT_SECRET!;
 
 const router = express.Router();
-router.use(cookieParser()); 
+router.use(cookieParser());
 
-router.post("/register", async (req : AuthReq, res: AuthRes) => {
+router.post("/register", async (req: AuthReq, res: AuthRes) => {
   try {
     const { username, email, password } = req.body;
     console.log("🔍 Incoming Registration Request:", { username, email });
@@ -43,7 +43,7 @@ router.post("/register", async (req : AuthReq, res: AuthRes) => {
       { expiresIn: "1h" }
     );
 
-    console.log("✅ User registered successfully:", user.email);
+    console.log("User registered successfully:", user.email);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -90,7 +90,7 @@ router.post("/login", async (req: AuthReq, res: AuthRes) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 3600000, 
+      maxAge: 3600000,
     });
 
     res.status(200).json({ message: "Login successful", token, user: { id: user.id, username: user.username, email: user.email } });
@@ -102,7 +102,7 @@ router.post("/login", async (req: AuthReq, res: AuthRes) => {
 
 router.post("/logout", (req: AuthReq, res: AuthRes) => {
 
-  res.clearCookie("token"); 
+  res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
 });
 
@@ -156,8 +156,7 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
       [email]
     );
 
-
-    if (existingUser.rows.length > 0 ) {
+    if (existingUser.rows.length > 0) {
       user = existingUser.rows[0];
 
       // if (!user.username) {
@@ -173,14 +172,14 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
         JWT_SECRET,
         { expiresIn: "3h" }
       );
-  
+
       res.cookie("token", jwtToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 3600000,
       });
-  
+
       return res.status(200).send({
         success: true,
         message: "Google Authentication Successful",
@@ -199,14 +198,14 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
         JWT_SECRET,
         { expiresIn: "3h" }
       );
-  
+
       res.cookie("token", jwtToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 3600000,
       });
-  
+
       return res.status(200).send({
         success: true,
         message: "Google Authentication Successful, Please set username",

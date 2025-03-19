@@ -20,7 +20,7 @@ if (!fs.existsSync(logFile)) {
   fs.writeFileSync(logFile, ""); // Create an empty log file if missing
 }
 
-function logMessage(message) {
+function logMessage(message : string) {
   const timestamp = new Date().toISOString();
   const logEntry = `[${timestamp}] ${message}\n`;
   try {
@@ -30,16 +30,15 @@ function logMessage(message) {
   }
 }
 
-console.log = (...args) => {
+console.log = (...args : string[]) => {
   logMessage(args.join(" "));
   process.stdout.write(args.join(" ") + "\n");
 };
 
-console.error = (...args) => {
+console.error = (...args : string[]) => {
   logMessage("ERROR: " + args.join(" "));
   process.stderr.write(args.join(" ") + "\n");
 };
-
 
 const app = express();
 
@@ -58,7 +57,7 @@ app.use("/api/bets", betRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
-app.get("/", (req, res) => {
+app.get("/", (req: AuthReq, res: AuthRes) => {
   res.send("Backend is running!");
 });
 
