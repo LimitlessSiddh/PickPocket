@@ -94,9 +94,9 @@ function App() {
                 <Navigate to="/" replace />
               )}
             />
-            &&
+            
             <Route path="/subscriptions" element={user ? <SubsPage user={user} /> : <Navigate to="/" replace />}></Route>
-            &&
+            
             <Route path="/:userName" element={<OtherUser user = {user as User}/>}/>
           
           <Route path="/register" element={<Register setUser={setUser} />} />

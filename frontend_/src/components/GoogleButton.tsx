@@ -31,7 +31,7 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
                 const user: User = backend_response.user;
                 setUser(user);
 
-                navigate("/profile");
+                navigate(`/${user.username}`);
 
 
             } else {

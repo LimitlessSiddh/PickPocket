@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/:userName", async (req: AuthReq, res: AuthRes) => {
     try {
-        const userName: string = req.params.userName;
+        const { userName } = req.params;
 
         const wantedUserQuery = await pool.query(`
                 Select * from users
@@ -24,7 +24,7 @@ router.get("/:userName", async (req: AuthReq, res: AuthRes) => {
             wantedUser: {
                 id : wantedUser.id,
                 email: wantedUser.email,
-                userName: wantedUser.username,
+                username: wantedUser.username,
                 points: wantedUser.points
             }
         })
@@ -36,4 +36,6 @@ router.get("/:userName", async (req: AuthReq, res: AuthRes) => {
         });
         console.log(error);
     }
-})
+});
+
+export default router;

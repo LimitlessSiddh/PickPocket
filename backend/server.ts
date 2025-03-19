@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.ts";
 import betRoutes from "./routes/bets.ts"; 
 import userRoutes from "./routes/user.ts";
+import otherRoutes from "./routes/others.ts"
 import leaderboardRoutes from "./routes/leaderboard.ts";
 import cron from "node-cron";
 import { validateBets } from "./routes/validateBets.ts"; 
@@ -56,6 +57,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/bets", betRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api", otherRoutes)
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Backend is running!");

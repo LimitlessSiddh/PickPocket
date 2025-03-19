@@ -29,7 +29,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
     <header className="fixed top-0 left-0 w-full bg-[#0a192f] text-whitesmoke z-10 shadow-lg">
       <div className="container mx-auto flex justify-between items-center py-4">
         <div className="text-2xl font-bold text-white hover: transition-transform duration-500 ease-in-out transform hover:scale-[1.1]">
-          <Link to="/">PickPocket</Link>
+          <Link to="/" onClick={(): void => setMenuOpen(!menuOpen)}>PickPocket</Link>
         </div>
 
         <div className="flex items-center md:hidden">
