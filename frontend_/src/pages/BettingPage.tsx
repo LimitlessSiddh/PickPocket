@@ -93,6 +93,7 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }: BettingPageProps) 
       user_id: user.id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      profit_loss: 0 // make sure before
     };
 
     setBets((prevBets) => {

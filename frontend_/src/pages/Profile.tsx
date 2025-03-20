@@ -58,7 +58,7 @@ const Profile = ({ user }: ProfilePageProps) => {
 
       {/* Betting History Cards */}
       <div className="w-full max-w-3xl mt-10 bg-white rounded-xl border-1 border-blue-500 text-black p-6">
-        <h2 className="text-xl font-bold  mb-4">📊 Betting History</h2>
+        <h2 className="text-xl font-bold  mb-4">Betting History</h2>
 
         {error && <p className="text-red-500 text-center">{error}</p>}
 

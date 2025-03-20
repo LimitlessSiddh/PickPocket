@@ -28,17 +28,17 @@ declare global {
         updated_at: string | null;
     }
 
-    type Bet = {
-        amount_wagered: number;
+    interface Bet {
         id: number;
         user_id: number;
-        teams: string;
-        team_selected: string;
-        sport_key: string;
+        match_id: string | number;
+        team_selected?: string;
         odds: number;
-        match_id: number;
-        created_at: string | null;
-        updated_at: string | null;
+        amount_wagered?: number;
+        result?: string;
+        winnings?: number;
+        profit_loss: number;
+        sport_key: string;
     }
 
     type PastBet = Bet & {
