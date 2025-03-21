@@ -1,11 +1,14 @@
 import express from "express";
 import pool from "../config/db.ts";
+import authMiddleware from "../middleware/authMiddleware.ts";
 
 const router = express.Router();
 
-router.get("/:userName", async (req: AuthReq, res: AuthRes) => {
+router.get("/:userName", authMiddleware, async (req: AuthReq, res: AuthRes) => {
     try {
         const { userName } = req.params;
+        const signedInUserId = req.user.id;
+
 
         const wantedUserQuery = await pool.query(`
                 Select * from users
@@ -20,7 +23,15 @@ router.get("/:userName", async (req: AuthReq, res: AuthRes) => {
 
         const wantedUser: User = wantedUserQuery.rows[0];
 
+        const SignedInSubbedQuery = await pool.query(`
+            Select * from subscriptions
+            where subscriber_id = $1 and sub_to_id = $2
+        `, [signedInUserId, wantedUser.id])
+
+        const subbed = SignedInSubbedQuery.rows.length == 1;
+
         res.status(200).json({
+            subbed : subbed,
             wantedUser: {
                 id: wantedUser.id,
                 email: wantedUser.email,

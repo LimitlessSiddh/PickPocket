@@ -9,6 +9,40 @@ const OtherUser = ({ user }: OtherUserProps) => {
     const [wantedUser, setWantedUser] = useState<User | null>(null);
     const [history, setHistory] = useState<Bet[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [subbed, setSubbed] = useState<boolean | null>(null);
+    const token = localStorage.getItem("token");
+
+
+    const subscribeButtonClick = async () => {
+        const action = subbed ? "unsubscribe from" : "subscribe to";
+        const message = `Are you sure you want to ${action} ${wantedUser?.username}?`;
+
+        if (confirm(message)) {
+            let response;
+            if(! subbed){
+                response = await axios.post("http://localhost:5002/api/subscriptions/subscribe", {
+                    wantedUserID : wantedUser!.id, wantedUserName: wantedUser!.username
+                }, {headers: { Authorization: `Bearer ${token}`}})
+
+
+            } else{
+                response = await axios.post("http://localhost:5002/api/subscriptions/unsubscribe", {
+                    wantedUserID : wantedUser!.id, wantedUserName: wantedUser!.username
+                }, {headers: { Authorization: `Bearer ${token}`}})
+            }
+            
+            response.status === 200 ? setSubbed(!subbed) : alert("There was an error during your action. Please try again later")
+        }
+    };
+
+    const subButton = <button onClick={() => subscribeButtonClick()} className="bg-blue-900 text-white py-2 px-4 rounded hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 mt-12 transition-transform transform hover:scale-105">
+        Subscribe
+    </button>
+
+    const unsubButton = <button onClick={() => subscribeButtonClick()} className="bg-gray-800 text-white py-2 px-4 rounded hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 mt-12 transition-transform transform hover:scale-105">
+        Unsubscribe
+    </button>
+
 
     useEffect(() => {
         const getProfile = async () => {
@@ -17,14 +51,18 @@ const OtherUser = ({ user }: OtherUserProps) => {
                     navigate("/");
                 }
 
-                const response = await axios.get(`http://localhost:5002/api/${userName}`);
+                const response = await axios.get(`http://localhost:5002/api/${userName}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 if (response.status == 500) {
                     navigate("/")
                 }
 
                 setWantedUser(response.data.wantedUser);
+                setSubbed(response.data.subbed);
 
             } catch (error) {
+                setLoading(true);
                 console.log(error);
             } finally {
                 setLoading(false);
@@ -87,10 +125,8 @@ const OtherUser = ({ user }: OtherUserProps) => {
             </div>
 
             {
-                (user.username != wantedUser.username) &&
-                <button className="bg-blue-900 text-white py-2 px-4 rounded hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 mt-12 transition-transform transform hover:scale-105">
-                    Subscribe
-                </button>
+                (user.username != wantedUser.username && !subbed) ?
+                    subButton : unsubButton
             }
 
             <div className="w-full max-w-3xl mt-10 bg-white rounded-xl border-1 border-blue-500 text-black p-6">

@@ -21,11 +21,17 @@ declare global {
     }
 
     type Subscription = {
+        id : number;
         price: number;
         sub_to: User;
         subscriber: User;
-        created_at: string | null;
-        updated_at: string | null;
+        created_at: string;
+        updated_at: string;
+        sub_to_name? : string;
+        subscriber_name? : string;
+        subscriber_id? : number;
+        sub_to_id? : number
+
     }
 
     interface Bet {
@@ -103,6 +109,7 @@ declare global {
 
     interface SubscriptionPage {
         user: User;
+        subscription : Subscription[];
     }
 
     interface SetUsernameProps {
