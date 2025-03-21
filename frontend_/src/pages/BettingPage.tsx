@@ -75,7 +75,7 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }: BettingPageProps) 
     name: string;
   };
 
-  // ✅ Fix: Ensure BetSlip is always shown when a new bet is added
+  // Fix: Ensure BetSlip is always shown when a new bet is added
   const addToBetSlip = (match: Match, outcome: Outcome) => {
     if (!user) {
       alert("You must be logged in to place a bet.");
@@ -86,22 +86,23 @@ const BettingPage = ({ user, bets, setBets, setShowBetSlip }: BettingPageProps) 
       match_id: match.id,
       team_selected: outcome.name,
       odds: outcome.price,
-      amount_wagered: 100, // ✅ FIX: Ensures `amount_wagered` is always included
+      amount_wagered: 100, // FIX: Ensures `amount_wagered` is always included
       sport_key: match.sport_key,
       teams: `${match.home_team} vs ${match.away_team}`,
       id: Date.now(),
       user_id: user.id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      profit_loss: 0 // make sure before
     };
 
     setBets((prevBets) => {
-      setShowBetSlip(true); // ✅ Ensure BetSlip appears on new bet
+      setShowBetSlip(true); // Ensure BetSlip appears on new bet
       return [...prevBets, newBet];
     });
   };
 
-  // ✅ Auto-hide BetSlip after 4 seconds if no new bets are added
+  // Auto-hide BetSlip after 4 seconds if no new bets are added
   useEffect(() => {
     if (bets.length === 0) return;
 

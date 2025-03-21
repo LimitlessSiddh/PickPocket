@@ -33,7 +33,7 @@ const Login = ({ setUser }: LoginPageProps) => {
 
         console.log("Token Saved:", localStorage.getItem("token"));
 
-        navigate("/profile");
+        navigate(`/${user.username}`);
       } else {
         console.error("No token received.");
         setError("Invalid email or password");
