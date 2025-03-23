@@ -1,19 +1,19 @@
 import express from "express";
 import pool from "../config/db.ts";
-import authMiddleware from "../middleware/authMiddleware.ts"; // Protect Routes
-import multer from "multer"; // For image uploads
+import authMiddleware from "../middleware/authMiddleware.ts";
+import multer from "multer";
 import bcrypt from "bcryptjs";
 
 const router = express.Router();
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// GET /profile
 router.get("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const userId = req.user.id;
     const userQuery = await pool.query(
-      "SELECT id, username, email, avatar FROM users WHERE id = $1",
+      "SELECT id, username, email, avatar, score, level FROM users WHERE id = $1",
       [userId]
     );
 
@@ -28,6 +28,7 @@ router.get("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   }
 });
 
+// PUT /profile
 router.put("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const { username, email } = req.body;
@@ -45,12 +46,12 @@ router.put("/profile", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   }
 });
 
+// PUT /profile/password
 router.put("/profile/password", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    // Get user password
     const userQuery = await pool.query("SELECT password FROM users WHERE id = $1", [userId]);
     if (userQuery.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -71,10 +72,15 @@ router.put("/profile/password", authMiddleware, async (req: AuthReq, res: AuthRe
   }
 });
 
+// PUT /profile/avatar
 router.put("/profile/avatar", authMiddleware, upload.single("avatar"), async (req: AuthReq, res: AuthRes) => {
   try {
     const userId = req.user.id;
-    const avatarData = req.file.buffer.toString("base64"); // Convert image to Base64
+    if (!req.file) {
+      return res.status(400).json({ message: "No avatar file uploaded." });
+    }
+
+    const avatarData = req.file.buffer.toString("base64");
 
     await pool.query("UPDATE users SET avatar = $1 WHERE id = $2", [avatarData, userId]);
 
@@ -86,7 +92,3 @@ router.put("/profile/avatar", authMiddleware, upload.single("avatar"), async (re
 });
 
 export default router;
-
-
-
-
