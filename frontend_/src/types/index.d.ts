@@ -1,6 +1,8 @@
 declare global {
 
     type User = {
+        score: ReactNode;
+        level: ReactNode;
         id: number;
         username: string;
         email: string;

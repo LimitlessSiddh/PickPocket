@@ -3,6 +3,8 @@ import axios from "axios";
 import pool from "../config/db.ts";
 import authMiddleware from "../middleware/authMiddleware.ts";
 import dotenv from "dotenv";
+import { validateBets } from "./validateBets.ts";
+import { v4 as uuidv4 } from "uuid"; // ✅ For generating parlay IDs
 
 dotenv.config();
 
@@ -10,11 +12,7 @@ const router = express.Router();
 const ODDS_API_KEY: string = process.env.ODDS_API_KEY!;
 const ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/";
 
-// ✅ Define Types for Requests and Bets
-
-
-
-// ✅ POST Route: Submit a Bet
+// ✅ POST: Submit Single or Parlay Bet
 router.post("/", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   if (!req.user || !req.user.id) {
     return res.status(401).json({ message: "Unauthorized. Please log in." });
@@ -24,140 +22,82 @@ router.post("/", authMiddleware, async (req: AuthReq, res: AuthRes) => {
     const { bets } = req.body;
     const userId = req.user.id;
 
-    if (!bets || bets.length === 0) {
+    if (!bets || !Array.isArray(bets) || bets.length === 0) {
       return res.status(400).json({ message: "No bets provided." });
     }
 
-    console.log("📌 Incoming Bet Data:", bets);
+    const isParlay = bets.length > 1;
+    const parlayId = isParlay ? uuidv4() : null;
 
     const insertedBets: Bet[] = [];
+
     for (const bet of bets) {
       const { match_id, team_selected, odds, amount_wagered, sport_key } = bet;
 
-      if (!match_id || !team_selected || !odds || !amount_wagered || !sport_key) {
-        console.log("❌ Missing required fields:", bet);
-        return res.status(400).json({ message: "Invalid bet format. Missing required fields." });
+      if (!match_id || !team_selected || !odds || !sport_key) {
+        return res.status(400).json({ message: "Missing required fields in bet." });
       }
 
-      // ✅ Fetch Match Data to Ensure Match Exists
-      const response = await axios.get(`${ODDS_API_URL}${sport_key}/scores/`, {
-        params: { apiKey: ODDS_API_KEY },
-      });
-
-      if (!response.data || response.data.length === 0) {
-        console.log("❌ API Error: No matches found for", sport_key);
-        return res.status(400).json({ message: "API error: Match not found." });
-      }
-
-      const match = response.data.find((m: { id: string }) => m.id === match_id);
-      if (!match) {
-        console.log("❌ Invalid Match ID:", match_id);
-        return res.status(400).json({ message: "Invalid match ID. Match not found." });
-      }
-
-      // ✅ Insert Bet into Database
-      const newBet = await pool.query(
-        `INSERT INTO bets (user_id, match_id, team_selected, odds, amount_wagered, result, winnings, profit_loss, sport_key, created_at) 
-         VALUES ($1, $2, $3, $4, $5, 'pending', 0, 0, $6, NOW()) RETURNING *`,
-        [userId, match.id, team_selected, odds, amount_wagered, sport_key]
+      const result = await pool.query(
+        `INSERT INTO bets (
+          user_id, match_id, team_selected, odds, amount_wagered, result, winnings,
+          profit_loss, sport_key, created_at, parlay_id
+        ) VALUES (
+          $1, $2, $3, $4, $5, 'pending', 0, 0, $6, NOW(), $7
+        ) RETURNING *`,
+        [userId, match_id, team_selected, odds, amount_wagered || 0, sport_key, parlayId]
       );
 
-      console.log("✅ Bet Inserted:", newBet.rows[0]);
-      insertedBets.push(newBet.rows[0]);
+      insertedBets.push(result.rows[0]);
     }
 
-    res.status(201).json({ message: "Bet placed successfully!", bets: insertedBets });
+    // ✅ Trigger validation right after submission
+    const validationResult = await validateBets();
+
+    res.status(201).json({
+      message: isParlay ? "Parlay placed!" : "Single bet placed!",
+      bets: insertedBets,
+      validation: validationResult,
+    });
   } catch (error) {
     console.error("❌ Betting Error:", error);
-    res.status(500).json({ message: "Server error. Please try again later.", error });
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
 
-// ✅ PUT Route: Update Bet Results
-router.put("/update-results", async (req: AuthReq, res: AuthRes) => {
+// ✅ GET: Fetch All Bets (for frontend display)
+router.get("/", async (_req: AuthReq, res: AuthRes) => {
   try {
-    console.log("🔄 Running bet validation...");
-    const pendingBets = await pool.query("SELECT * FROM bets WHERE result = 'pending'");
-
-    if (pendingBets.rows.length === 0) {
-      return res.json({ message: "No pending bets to validate." });
-    }
-
-    let updatedBets: PastBet[] = [];
-
-    for (let bet of pendingBets.rows) {
-      if (!bet.sport_key) continue;
-      try {
-        // ✅ Fetch Match Scores
-        const response = await axios.get(`${ODDS_API_URL}${bet.sport_key}/scores/`, {
-          params: { apiKey: ODDS_API_KEY },
-        });
-
-        if (!response.data || response.data.length === 0) {
-          console.error(`❌ No match data for bet ID ${bet.id}`);
-          continue;
-        }
-
-        const match = response.data.find((m: { id: string; completed: boolean }) => m.id === bet.match_id);
-        if (!match || !match.completed) continue;
-
-        console.log(`✅ Match ${bet.match_id} completed. Checking winner...`);
-
-        // ✅ Extract Scores
-        const homeScore = match.scores?.find((s: { name: string }) => s.name === match.home_team)?.score;
-        const awayScore = match.scores?.find((s: { name: string }) => s.name === match.away_team)?.score;
-
-        if (homeScore === undefined || awayScore === undefined) {
-          console.error(`❌ Missing scores for match ${bet.match_id}`);
-          continue;
-        }
-
-        let winningTeam = homeScore > awayScore ? match.home_team : match.away_team;
-        let matchResult: "win" | "loss" = winningTeam === bet.team_selected ? "win" : "loss";
-
-        // ✅ Calculate Profit & Loss
-        let winnings = matchResult === "win" ? bet.amount_wagered * bet.odds : 0;
-        let profitLoss = matchResult === "win" ? winnings - bet.amount_wagered : -bet.amount_wagered;
-
-        // ✅ Update Bet Result in Database
-        await pool.query(
-          "UPDATE bets SET result = $1, profit_loss = $2, winnings = $3 WHERE id = $4",
-          [matchResult, profitLoss, winnings, bet.id]
-        );
-
-        updatedBets.push({
-          id: bet.id as number,
-          user_id: bet.user_id as number,
-          sport_key: bet.sport_key as string,
-          odds: bet.odds as number,
-          match_id: bet.match_id as string,
-          result: matchResult as "win" | "loss",
-          profit_loss: profitLoss as number,
-          team_selected: bet.team_selected as string,
-          winnings: winnings as number,
-          amount_wagered: bet.amount_wagered as number,
-        });
-      } catch (error) {
-        console.error(`❌ Error validating bet ${bet.id}:`, error);
-      }
-    }
-
-    res.json({ message: "Bets validated successfully!", updatedBets });
-  } catch (error) {
-    console.error("❌ Error validating bets:", error);
-    res.status(500).json({ message: "Server error during bet validation." });
-  }
-});
-
-// ✅ Debug Route: Fetch All Bets
-router.get("/", async (req: AuthReq, res: AuthRes) => {
-  try {
-    console.log("📌 Fetching All Bets...");
     const bets = await pool.query("SELECT * FROM bets ORDER BY created_at DESC");
     res.json(bets.rows);
   } catch (error) {
     console.error("❌ Error fetching bets:", error);
     res.status(500).json({ message: "Server error while fetching bets." });
+  }
+});
+
+// ✅ GET: Betting Stats for Logged-in User
+router.get("/stats", authMiddleware, async (req: AuthReq, res: AuthRes) => {
+  try {
+    const userId = req.user.id;
+
+    const statsQuery = await pool.query(
+      `
+      SELECT 
+        COUNT(*) AS total_bets,
+        SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) AS total_wins,
+        SUM(CASE WHEN result = 'loss' THEN 1 ELSE 0 END) AS total_losses
+      FROM bets
+      WHERE user_id = $1
+      `,
+      [userId]
+    );
+
+    const stats = statsQuery.rows[0];
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("❌ Error fetching betting stats:", error);
+    res.status(500).json({ message: "Failed to fetch betting stats." });
   }
 });
 
