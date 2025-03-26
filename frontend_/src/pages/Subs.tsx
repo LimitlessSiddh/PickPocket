@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const SubsPage = ({ user }: SubscriptionPage) => {
+const SubsPage = ({ user }: SubscriptionPageProps) => {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);

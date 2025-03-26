@@ -109,7 +109,7 @@ declare global {
     interface RegisterPageProps extends LoginPageProps {
     }
 
-    interface SubscriptionPage {
+    interface SubscriptionPageProps {
         user: User;
         subscription : Subscription[];
     }

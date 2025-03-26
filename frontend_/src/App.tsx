@@ -21,7 +21,6 @@ function App() {
   const [showBetSlip, setShowBetSlip] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("Stored Token:", localStorage.getItem("token"));
 
     if (!localStorage.getItem("token")) {
       console.log("No token found, user is NULL.");
@@ -95,7 +94,7 @@ function App() {
               )}
             />
             
-            <Route path="/subscriptions" element={user ? <SubsPage user={user} /> : <Navigate to="/" replace />}></Route>
+            <Route path="/subscriptions" element={user ? <SubsPage user={user} subscription={[]} /> : <Navigate to="/" replace />}></Route>
             
             <Route path="/:userName" element={<OtherUser user = {user as User}/>}/>
           

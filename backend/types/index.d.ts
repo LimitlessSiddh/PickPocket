@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, } from "express";
 
 declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-      file?: Express.Multer.File;
-    }
+//   namespace Express {
+//     interface Request {
+//       user?: User;
+//       file?: Express.Multer.File;
+//     }
 
-    interface Response {
-      user?: User;
-    }
-  }
+//     interface Response {
+//       user?: User;
+//     }
+//   }
 
   type User = {
     score: number;
@@ -70,6 +70,15 @@ declare global {
     scores?: Score[];
     completed?: boolean;
   };
+
+  interface AuthReq extends Request {
+    user?: any;
+    file?: any;
+}
+
+interface AuthRes extends Response {
+    user?: any;
+}
 }
 
 export {};
