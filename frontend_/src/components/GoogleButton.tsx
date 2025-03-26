@@ -3,20 +3,17 @@ import axios from 'axios';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { firebase_auth } from '../../firebase';
 import google_img from "../assets/google_logo.png";
-// import SetUsernameForm from './SetUserName';
-import { useState } from 'react';
+//import SetUsernameForm from './SetUserName';
+//import { useState } from 'react';
 
 const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
     const navigate = useNavigate();
-    const [email, setEmail] = useState<string>("");
-    const [showUsernameForm, setShowUsernameForm] = useState<boolean>(false);
+
 
     const handleGoogleAuth = async (): Promise<void> => {
         try {
             const provider = new GoogleAuthProvider();
-
             const result = await signInWithPopup(firebase_auth, provider)
-
             const idToken = await result.user.getIdToken();
 
             const response = await axios.post(
@@ -25,19 +22,18 @@ const GoogleButton = ({ setUser, setError }: GoogleButtonProps) => {
                 { withCredentials: true }
             );
 
-            const backend_response = response.data;
 
-            if (backend_response.success) {
-                const user: User = backend_response.user;
+            if (response.data.success) {
+                const user: User = response.data.user;
+                const token = response.data.jwtToken;
+
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify(user));
                 setUser(user);
-
                 navigate(`/${user.username}`);
-
-
             } else {
                 console.log("failed google login after backend response");
             }
-
 
 
         } catch (error: unknown) {

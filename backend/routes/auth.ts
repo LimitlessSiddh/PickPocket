@@ -145,13 +145,11 @@ router.get("/profile", authenticateUser, async (req: AuthReq, res: AuthRes) => {
 router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
   const token = req.body.token;
   try {
-
     const decoded_token = await admin.auth().verifyIdToken(token);
     const email = decoded_token.email;
     const username = decoded_token.name;
     let user: User;
 
-    // check if in db alr
     const existingUser = await pool.query(
       "SELECT id, username, email FROM users WHERE email = $1 LIMIT 1",
       [email]
@@ -159,120 +157,42 @@ router.post("/googleAuth", async (req: AuthReq, res: AuthRes) => {
 
     if (existingUser.rows.length > 0) {
       user = existingUser.rows[0];
-
-      // if (!user.username) {
-      //   return res.status(200).send({
-      //     success: true,
-      //     message: "Google Authentication Successful, but username is not set.",
-      //     user: { id: user.id, email: user.email, username: null }, // Username is null
-      //   });
-      // }
-
-      const jwtToken = jwt.sign(
-        { id: user.id, username: user.username, email: user.email },
-        JWT_SECRET,
-        { expiresIn: "3h" }
-      );
-
-      res.cookie("token", jwtToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 3600000,
-      });
-
-      return res.status(200).send({
-        success: true,
-        message: "Google Authentication Successful",
-        user: { id: user.id, username: user.username, email: user.email },
-      });
-
     } else {
       const newUser = await pool.query(
-        "INSERT INTO users ( email, username) VALUES ($1, $2) RETURNING id, email",
+        "INSERT INTO users (email, username) VALUES ($1, $2) RETURNING id, username, email",
         [email, username]
       );
-      user = newUser.rows[0]
-
-      const jwtToken = jwt.sign(
-        { id: user.id, email: user.email, username: user.username },
-        JWT_SECRET,
-        { expiresIn: "3h" }
-      );
-
-      res.cookie("token", jwtToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 3600000,
-      });
-
-      return res.status(200).send({
-        success: true,
-        message: "Google Authentication Successful, Please set username",
-        user: { id: user.id, email: user.email, user: user.username},
-      });
+      user = newUser.rows[0];
     }
 
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email, username: user.username },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "strict",
+      maxAge: 3600000, 
+    });
+
+    return res.status(200).send({
+      success: true,
+      message: "Google Authentication Successful",
+      user: { id: user.id, email: user.email, username: user.username },
+      jwtToken: jwtToken
+    });
+
   } catch (error) {
-    console.log("error in backend during google auth", error);
+    console.log("Error in backend during Google auth", error);
     return res.status(500).send({
       success: false,
       message: "Authentication failed",
     });
   }
-
 });
 
-// router.post("/setUsername", authenticateUser, async (req: AuthReq, res: AuthRes) => {
-//   try {
-//     const { username } = req.body;
-//     if (!username) {
-//       return res.status(400).json({ message: "Username is required." });
-//     }
-
-//     const userId = req.user.id;
-
-//     // Check if the username already exists in the database
-//     const existingUser = await pool.query(
-//       "SELECT id FROM users WHERE username = $1 LIMIT 1",
-//       [username]
-//     );
-
-//     if (existingUser.rows.length > 0) {
-//       return res.status(400).json({ message: "Username already taken." });
-//     }
-
-//     // Update the username in the database
-//     const updatedUser = await pool.query(
-//       "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username, email",
-//       [username, userId]
-//     );
-
-//     const user = updatedUser.rows[0];
-
-//     // Generate a new JWT token after setting the username
-//     const token = jwt.sign(
-//       { id: user.id, username: user.username, email: user.email },
-//       JWT_SECRET,
-//       { expiresIn: "3h" }
-//     );
-
-//     res.cookie("token", token, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "strict",
-//     });
-
-//     res.status(200).json({
-//       message: "Username set successfully",
-//       token,
-//       user: { id: user.id, username: user.username, email: user.email },
-//     });
-//   } catch (error) {
-//     console.error("Set Username Error:", error);
-//     res.status(500).json({ message: "Server error. Try again later." });
-//   }
-// });
 
 export default router;

@@ -76,7 +76,7 @@ router.get("/", async (_req: AuthReq, res: AuthRes) => {
   }
 });
 
-// ✅ GET: Betting Stats for Logged-in User
+
 router.get("/stats", authMiddleware, async (req: AuthReq, res: AuthRes) => {
   try {
     const userId = req.user.id;
