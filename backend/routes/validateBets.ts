@@ -18,6 +18,9 @@ const sportsWithScores = new Set([
   "icehockey_nhl",
 ]);
 
+// ✅ In-memory cache for match results per sport_key
+const scoreCache: Record<string, Match[]> = {};
+
 async function validateBets() {
   try {
     console.log("🔄 Running bet validation...");
@@ -32,7 +35,7 @@ async function validateBets() {
 
     const updatedBets: PastBet[] = [];
 
-    // 🧠 Group bets by parlay_id (or single bet)
+    // 🧠 Group bets by parlay_id or single
     const betGroups: Record<string, Bet[]> = {};
     for (const bet of pendingBets) {
       const key = bet.parlay_id || `single_${bet.id}`;
@@ -49,7 +52,6 @@ async function validateBets() {
       let totalOdds = 1;
       let user: User | null = null;
 
-      // Fetch results for each pick
       for (const bet of group) {
         if (!sportsWithScores.has(bet.sport_key)) {
           console.log(`❌ Skipping unsupported sport: ${bet.sport_key}`);
@@ -57,11 +59,16 @@ async function validateBets() {
           break;
         }
 
-        const response = await axios.get(`${ODDS_API_URL}${bet.sport_key}/scores/`, {
-          params: { apiKey: ODDS_API_KEY },
-        });
+        // ✅ Check if score data for this sport_key is already cached
+        if (!scoreCache[bet.sport_key]) {
+          console.log(`🌐 Fetching scores for sport: ${bet.sport_key}`);
+          const response = await axios.get(`${ODDS_API_URL}${bet.sport_key}/scores/`, {
+            params: { apiKey: ODDS_API_KEY },
+          });
+          scoreCache[bet.sport_key] = response.data;
+        }
 
-        const match = response.data.find((m: Match) => m.id === bet.match_id);
+        const match = scoreCache[bet.sport_key].find((m: Match) => m.id === bet.match_id);
         if (!match || !match.completed) {
           console.log(`⏳ Match not completed yet: ${bet.match_id}`);
           allResolved = false;
