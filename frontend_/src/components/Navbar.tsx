@@ -108,7 +108,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
         </nav>
       </div>
     </header>
-  );
+  );``
 };
 
 export default Navbar;
