@@ -31,3 +31,4 @@ eslint.config.js
 pickpocket-67458-firebase-adminsdk-fbsvc-71dcb2a00b.json
 
 venv
+__pycache__

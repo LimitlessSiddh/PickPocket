@@ -1,15 +1,17 @@
 import pandas as pd
 import numpy as np
 
+data_dict = {}
 
 class FetchData:
-    def __init__(self, csv, sport):
-        self.csv = csv
+    def __init__(self, csv_list, sport):
+        self.csv_list = csv_list
         self.sport = sport
-    def get_historical_data(self):
-        self.df = pd.read_csv(self.csv)
 
     def clean_data(self):
+        pass
+
+    def build_data_frame(self):
         pass
 
     
