@@ -8,18 +8,31 @@ from fetch_data import FetchData, csv_dict
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import yaml
+import datetime
 
 load_dotenv()
 
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 client = OpenAI(api_key=OPENAI_KEY)
 
+with open("secrets.yaml", "r") as f:
+    secrets = yaml.safe_load(f)
+
 INSTRUCTIONS = {
-    "nba": f"{os.getenv("NBA_INSTRUCTIONS")}",
-    "nfl": f"{os.getenv("NFL_INSTRUCTIONS")}",
-    "ufc": f"{os.getenv("UFC_INSTRUCTIONS")}",
-    "mlb": f"{os.getenv("MLB_INSTRUCTIONS")}",
+    "nba": f"{secrets["nba"]["instructions"]}",
+    "nfl": f"{secrets["nfl"]["instructions"]}",
+    "ufc": f"{secrets["ufc"]["instructions"]}",
+    "mlb": f"{secrets["mlb"]["instructions"]}",
     "nhl": f"{os.getenv("NHL_INSTRUCTIONS")}"
+}
+
+PROMPTS = {
+    "nba": f"{secrets["nba"]["prompt"]}",
+    "nfl": f"{secrets["nfl"]["prompt"]}",
+    "ufc": f"{secrets["ufc"]["prompt"]}",
+    "mlb": f"{secrets["mlb"]["prompt"]}",
+    "nhl": f"{secrets["nhl"]["prompt"]}"
 }
 
 
@@ -35,7 +48,7 @@ class AIModel():
         x_train, x_test, y_train, y_test = train_test_split(self.data, self.prediction_data, test_size=0.2, random_state=42)
         model = XGBRegressor()
     
-    def predict(self, home: str, away: str):
+    def predict(self, home: str, away: str, date: datetime.date):
         prompt = self.generate_prompt(home, away)
         openai_response = self.use_openai(prompt, INSTRUCTIONS[self.sport])
         new_prediction_data = pd.concat([self.prediction_data, pd.DataFrame(openai_response)], axis=1)
